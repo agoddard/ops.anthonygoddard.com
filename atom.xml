@@ -1,10 +1,10 @@
 <?xml version="1.0" encoding="utf-8"?>
 <feed xmlns="http://www.w3.org/2005/Atom">
 
-  <title><![CDATA[Ops]]></title>
+  <title><![CDATA[Anthony Goddard]]></title>
   <link href="http://agoddard.github.com/atom.xml" rel="self"/>
   <link href="http://agoddard.github.com/"/>
-  <updated>2012-11-17T21:15:04-05:00</updated>
+  <updated>2012-11-17T21:16:16-05:00</updated>
   <id>http://agoddard.github.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
