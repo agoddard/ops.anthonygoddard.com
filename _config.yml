@@ -29,7 +29,7 @@ email:
 root: /
 permalink: /blog/:year/:month/:day/:title/
 source: source
-destination: public/ops
+destination: public
 plugins: plugins
 code_dir: downloads/code
 category_dir: blog/categories
@@ -58,7 +58,7 @@ default_asides: [asides/recent_posts.html, asides/github.html, asides/twitter.ht
 # ----------------------- #
 
 # Github repositories
-github_user: agoddard
+github_user:
 github_repo_count: 2
 github_show_profile_link: true
 github_skip_forks: true
