@@ -4,7 +4,7 @@
   <title><![CDATA[Category: OpenStack | Anthony Goddard]]></title>
   <link href="http://agoddard.github.com/blog/categories/openstack/atom.xml" rel="self"/>
   <link href="http://agoddard.github.com/"/>
-  <updated>2012-11-18T23:35:05-05:00</updated>
+  <updated>2012-11-19T09:07:24-05:00</updated>
   <id>http://agoddard.github.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -18,7 +18,7 @@
     <link href="http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage"/>
     <updated>2012-11-17T22:28:00-05:00</updated>
     <id>http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage</id>
-    <content type="html"><![CDATA[<p>I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local LVM volumes, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+    <content type="html"><![CDATA[<p>I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
