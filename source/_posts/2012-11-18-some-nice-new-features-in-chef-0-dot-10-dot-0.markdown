@@ -3,7 +3,7 @@ layout: post
 title: "Some nice new features in Chef 0.10.0"
 date: 2011-05-10 17:54
 comments: true
-categories: 
+categories: Chef
 ---
 
 No sooner than I drafted my [last post](http://crankstations.com/cookbooks-as-gems), Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I'd heard that some big features, such as [environments](http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/) were coming, I hadn't realized how many cool features were due for release in 0.10.0 and I thought I'd mention a few of my favorite and perhaps lesser known new features here. 

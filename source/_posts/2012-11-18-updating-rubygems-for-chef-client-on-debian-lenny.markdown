@@ -3,7 +3,7 @@ layout: post
 title: "Updating rubygems for chef-client on debian lenny"
 date: 2011-01-21 17:54
 comments: true
-categories: 
+categories: Chef
 ---
 
 User Story:

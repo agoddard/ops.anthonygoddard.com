@@ -1,9 +1,10 @@
 ---
 layout: post
-title: "Openstack local LVM instance storage"
+title: "OpenStack Local LVM instance storage"
 date: 2012-11-17 22:28
 comments: true
-categories: openstack
+title_category: OpenStack
+categories: OpenStack
 ---
 I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local LVM volumes, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:
 

@@ -3,7 +3,7 @@ layout: post
 title: "Cookbooks as gems."
 date: 2011-05-04 17:54
 comments: true
-categories: 
+categories: Chef
 ---
 
 **Update:** Many of the questions below have been resolved in the [0.10.0 release of Chef](http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/) and Opscode have also provided a [great overview](http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/) of the current state of the community cookbooks repository. 

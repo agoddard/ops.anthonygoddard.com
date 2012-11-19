@@ -3,7 +3,7 @@ layout: post
 title: "Vagrant"
 date: 2011-08-15 17:54
 comments: true
-categories: 
+categories: Vagrant
 ---
 
 ####User Story:
@@ -41,7 +41,7 @@ Vagrant::Config.run do |config|
   config.vm.box = "lucid64"
 end
 {% endcodeblock%}
-Of course, simple doesn't mean it's lacking in ability - there's a [whole host of configuration options] you can specify from simple [ram] and [disk] customization to [auto provisioning] with chef, puppet or even simple bash scripts. Here's an example with a few more options thrown in: 
+Of course, simple doesn't mean it's lacking in ability - there's a [whole host of configuration options](http://vagrantup.com/v1/docs/vagrantfile.html) you can specify from simple [ram](http://vagrantup.com/v1/docs/config/vm/customize.html) settings to [auto provisioning](http://vagrantup.com/v1/docs/provisioners.html) with [chef](http://vagrantup.com/v1/docs/provisioners/chef_solo.html), [puppet](http://vagrantup.com/v1/docs/provisioners/puppet.html) or even simple [bash scripts](http://vagrantup.com/v1/docs/provisioners/shell.html). Here's an example with a few more options thrown in: 
 {% codeblock lang:ruby%} 
 Vagrant::Config.run do |config| 
   config.vm.box = "lucid64"

@@ -3,7 +3,7 @@ layout: post
 title: "Querying Chef using the REST API"
 date: 2010-12-09 17:54
 comments: true
-categories: 
+categories: Chef
 author: Chuck Ha
 author: Anthony Goddard
 ---

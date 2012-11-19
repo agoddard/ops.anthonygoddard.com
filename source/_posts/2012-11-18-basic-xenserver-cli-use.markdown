@@ -3,7 +3,7 @@ layout: post
 title: "Basic XenServer CLI use"
 date: 2010-12-10 17:54
 comments: true
-categories: 
+categories: XenServer
 ---
 
 I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer's 'xsconsole' tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.
