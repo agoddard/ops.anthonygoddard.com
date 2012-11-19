@@ -1,0 +1,62 @@
+---
+layout: post
+title: "Vagrant"
+date: 2011-08-15 17:54
+comments: true
+categories: 
+---
+
+####User Story:
+  * As a sysadmin 
+    * I want to provision virtual machines quickly and in a repeatable fashion 
+    * so that I can setup test clusters in development and easily share these with others
+   
+As a sysadmin, I'm a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it's nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout. 
+Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it's nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™. 
+###Enter Vagrant 
+[Vagrant](http://vagrantup.com) is a ruby gem which performs automated building and provisioning of VirtualBox machines. Vagrant takes care of all the behind the scenes work with VirtualBox, so while you need VirtualBox installed, you technically never even need to launch the app. 
+
+*So what? Double clicking an app doesn't take much time, and I get to use a nice GUI.*
+
+A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here's a simple example of getting up and running (I've trimmed a bit of the verbosity from the responses, but this is honestly it: 
+{% codeblock lang:bash%}
+[~/dev/vagrant-demo]$ gem install vagrant Successfully installed vagrant-0.8.2 
+[~/dev/vagrant-demo]$ vagrant box add lucid64 http://files.vagrantup.com/lucid64.box 
+[vagrant] Downloading box: http://files.vagrantup.com/lucid64.box 
+[vagrant] Verifying box... 
+[~/dev/vagrant-demo]$ vagrant init lucid64 create Vagrantfile 
+[~/dev/vagrant-demo]$ vagrant up 
+[default] Importing base box 'lucid64'... 
+[default] Forwarding ports... 
+[default] -- ssh: 22 => 2222 (adapter 1) 
+[default] VM booted and ready for use! 
+[default] Mounting shared folders... 
+[default] -- v-root: /vagrant 
+[~/dev/vagrant-demo]$ vagrant ssh Welcome to the Ubuntu Server! 
+vagrant@lucid64:~$ cat /etc/issue Ubuntu 10.04.3 LTS
+{% endcodeblock%}
+So what's actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn't get much simpler than this: 
+{% codeblock lang:ruby%} 
+Vagrant::Config.run do |config|
+  config.vm.box = "lucid64"
+end
+{% endcodeblock%}
+Of course, simple doesn't mean it's lacking in ability - there's a [whole host of configuration options] you can specify from simple [ram] and [disk] customization to [auto provisioning] with chef, puppet or even simple bash scripts. Here's an example with a few more options thrown in: 
+{% codeblock lang:ruby%} 
+Vagrant::Config.run do |config| 
+  config.vm.box = "lucid64"
+  config.vm.memory_size = 4096 
+  config.vm.host_name = 'awesome' 
+  config.vm.network "33.33.33.105" 
+end
+{% endcodeblock%}
+What about when you're done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I'll suggest you check out the [docs] and see for yourself. 
+
+*What about security? Who made this "box" file?*
+
+I hear you, but fear not. For those who want to build their own boxes, not only is this possible, but with a tool called [veewee](https://github.com/jedi4ever/veewee), [@patrickdebois](http://twitter.com/patrickdebois) has made is insanely easy. 
+I'll cover that in a followup post, but rest assured, this is Not a Problem™. 
+
+But wait, there's more...
+
+You can have more than one VM in a Vagrantfile and when assigned IPs, such as in the example above, these hosts can communicate over a private, host-only network. This paves the way for setting up whole stacks / clusters on a single host, bringing dev/test-like-prod nirvana just one step closer.
