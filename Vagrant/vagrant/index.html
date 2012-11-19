@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Vagrant &laquo; Vagrant  &laquo;  Anthony Goddard &laquo; DevOps</title>
+  <meta name="author" content="Anthony Goddard">
+
+  
+  <meta name="description" content="User Story: As a sysadmin I want to provision virtual machines quickly and in a repeatable fashion
+so that I can setup test clusters in development &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://agoddard.github.com/Vagrant/vagrant">
+  <link href="/favicon.ico" rel="icon">
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Anthony Goddard" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <h1>Anthony Goddard</h1>
+  
+    <h2><a href="/">OPS</a></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:agoddard.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="https://github.com/agoddard">Code</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Vagrant</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-15T17:54:00-04:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><h4>User Story:</h4>
+
+<ul>
+<li>As a sysadmin
+
+<ul>
+<li>I want to provision virtual machines quickly and in a repeatable fashion</li>
+<li>so that I can setup test clusters in development and easily share these with others</li>
+</ul>
+</li>
+</ul>
+
+
+<p>As a sysadmin, I&#8217;m a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it&#8217;s nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout.
+Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it&#8217;s nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™.</p>
+
+<h3>Enter Vagrant</h3>
+
+<p><a href="http://vagrantup.com">Vagrant</a> is a ruby gem which performs automated building and provisioning of VirtualBox machines. Vagrant takes care of all the behind the scenes work with VirtualBox, so while you need VirtualBox installed, you technically never even need to launch the app.</p>
+
+<p><em>So what? Double clicking an app doesn&#8217;t take much time, and I get to use a nice GUI.</em></p>
+
+<p>A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here&#8217;s a simple example of getting up and running (I&#8217;ve trimmed a bit of the verbosity from the responses, but this is honestly it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>gem install vagrant Successfully installed vagrant-0.8.2
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant box add lucid64 http://files.vagrantup.com/lucid64.box
+</span><span class='line'><span class="o">[</span>vagrant<span class="o">]</span> Downloading box: http://files.vagrantup.com/lucid64.box
+</span><span class='line'><span class="o">[</span>vagrant<span class="o">]</span> Verifying box...
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant init lucid64 create Vagrantfile
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant up
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> Importing base box <span class="s1">&#39;lucid64&#39;</span>...
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> Forwarding ports...
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> -- ssh: <span class="nv">22</span> <span class="o">=</span>&gt; 2222 <span class="o">(</span>adapter 1<span class="o">)</span>
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> VM booted and ready <span class="k">for </span>use!
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> Mounting shared folders...
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> -- v-root: /vagrant
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant ssh Welcome to the Ubuntu Server!
+</span><span class='line'>vagrant@lucid64:~<span class="nv">$ </span>cat /etc/issue Ubuntu 10.04.3 LTS
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So what&#8217;s actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn&#8217;t get much simpler than this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;lucid64&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course, simple doesn&#8217;t mean it&#8217;s lacking in ability - there&#8217;s a <a href="http://vagrantup.com/v1/docs/vagrantfile.html">whole host of configuration options</a> you can specify from simple <a href="http://vagrantup.com/v1/docs/config/vm/customize.html">ram</a> settings to <a href="http://vagrantup.com/v1/docs/provisioners.html">auto provisioning</a> with <a href="http://vagrantup.com/v1/docs/provisioners/chef_solo.html">chef</a>, <a href="http://vagrantup.com/v1/docs/provisioners/puppet.html">puppet</a> or even simple <a href="http://vagrantup.com/v1/docs/provisioners/shell.html">bash scripts</a>. Here&#8217;s an example with a few more options thrown in:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;lucid64&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">memory_size</span> <span class="o">=</span> <span class="mi">4096</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">host_name</span> <span class="o">=</span> <span class="s1">&#39;awesome&#39;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span> <span class="s2">&quot;33.33.33.105&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What about when you&#8217;re done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I&#8217;ll suggest you check out the [docs] and see for yourself.</p>
+
+<p><em>What about security? Who made this &#8220;box&#8221; file?</em></p>
+
+<p>I hear you, but fear not. For those who want to build their own boxes, not only is this possible, but with a tool called <a href="https://github.com/jedi4ever/veewee">veewee</a>, <a href="http://twitter.com/patrickdebois">@patrickdebois</a> has made is insanely easy.
+I&#8217;ll cover that in a followup post, but rest assured, this is Not a Problem™.</p>
+
+<p>But wait, there&#8217;s more&#8230;</p>
+
+<p>You can have more than one VM in a Vagrantfile and when assigned IPs, such as in the example above, these hosts can communicate over a private, host-only network. This paves the way for setting up whole stacks / clusters on a single host, bringing dev/test-like-prod nirvana just one step closer.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn"><a href="/about" title="About the author (Anthony Goddard)" rel="author">Anthony Goddard</a></span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-15T17:54:00-04:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/vagrant/'>Vagrant</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://agoddard.github.com/Vagrant/vagrant" data-via="" data-counturl="http://agoddard.github.com/Vagrant/vagrant" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0" title="Previous Post: Some nice new features in Chef 0.10.0">&laquo; Some nice new features in Chef 0.10.0</a>
+      
+      
+        <a class="basic-alignment right" href="/OpenStack/OpenStack-local-lvm-instance-storage" title="next Post: OpenStack Local LVM instance storage">OpenStack Local LVM instance storage &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Anthony Goddard -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://agoddard.github.com/Vagrant/vagrant';
+        var disqus_url = 'http://agoddard.github.com/Vagrant/vagrant';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

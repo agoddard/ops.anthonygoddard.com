@@ -1,0 +1,274 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Cookbooks as gems. &laquo; Chef  &laquo;  Anthony Goddard &laquo; DevOps</title>
+  <meta name="author" content="Anthony Goddard">
+
+  
+  <meta name="description" content="Update: Many of the questions below have been resolved in the 0.10.0 release of Chef and Opscode have also provided a great overview of the current &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://agoddard.github.com/Chef/cookbooks-as-gems">
+  <link href="/favicon.ico" rel="icon">
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Anthony Goddard" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <h1>Anthony Goddard</h1>
+  
+    <h2><a href="/">OPS</a></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:agoddard.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="https://github.com/agoddard">Code</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Cookbooks as Gems.</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-04T17:54:00-04:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p><strong>Update:</strong> Many of the questions below have been resolved in the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">0.10.0 release of Chef</a> and Opscode have also provided a <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">great overview</a> of the current state of the community cookbooks repository.</p>
+
+<p><strong>User Story:</strong></p>
+
+<ul>
+<li>As a sysadmin
+
+<ul>
+<li>I&#8217;d like to version cookbooks and download custom cookbooks</li>
+<li>  so that I can better manage cookbook dependencies.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>I&#8217;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&#8217;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &#8216;vendor&#8217; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&#8217;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
+*   &#8220;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &#8221;
+*   &#8220;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&#8217;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&#8221;
+*   &#8220;I&#8217;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&#8221; Rather than get into too much detail about those specific cases, I thought I&#8217;d provide an example of what a rubygems-esque cookbook management process might look like</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>knife cookbook install apache2 <span class="c"># installs the apache2 cookbook along with dependencies </span>
+</span><span class='line'>knife cookbook install apache2 --version<span class="o">=</span>1.02 <span class="c"># installs a legacy version of the apache2 cookbook </span>
+</span><span class='line'>knife cookbook install agoddard-apache2 <span class="c"># installs my fork of the apache2 cookbook along with dependencies </span>
+</span><span class='line'>knife cookbook install agoddard-custom_weird_app <span class="c"># installs my cookbook and dependencies for an obscure app that only I use but which I want to manage the same way </span>
+</span><span class='line'>knife cookbook install custom_weird_app <span class="c"># the above cookbook when the obscure app becomes more mainstream</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&#8230;and how these might look in a recipe&#8230;</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;apache2&quot;</span>
+</span><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;agoddard-apache2&quot;</span>
+</span><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;apache2&quot;</span><span class="p">,</span> <span class="s2">&quot;=1.02&quot;</span>
+</span><span class='line'><span class="sx">%w{ apache2 agoddard-apache2 apache2-1.02 }</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">cb</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">depends</span> <span class="n">cb</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m sure there&#8217;s things I&#8217;m missing here, but I&#8217;d love to see where this concept leads.. cookbooks already support versioning but I&#8217;m not sure if there&#8217;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&#8217;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&#8217;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&#8217;t ideal, but it&#8217;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&#8217;m sure there are many other approaches to this same issue and I&#8217;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&#8217;m looking at the beginnings of something big, like github or rubygems and I&#8217;m excited to see where it goes.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn"><a href="/about" title="About the author (Anthony Goddard)" rel="author">Anthony Goddard</a></span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-04T17:54:00-04:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/chef/'>Chef</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://agoddard.github.com/Chef/cookbooks-as-gems" data-via="" data-counturl="http://agoddard.github.com/Chef/cookbooks-as-gems" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/Chef/updating-rubygems-for-chef-client-on-debian-lenny" title="Previous Post: Updating rubygems for chef-client on debian lenny">&laquo; Updating rubygems for chef-client on debian lenny</a>
+      
+      
+        <a class="basic-alignment right" href="/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0" title="next Post: Some nice new features in Chef 0.10.0">Some nice new features in Chef 0.10.0 &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Anthony Goddard -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://agoddard.github.com/Chef/cookbooks-as-gems';
+        var disqus_url = 'http://agoddard.github.com/Chef/cookbooks-as-gems';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

@@ -1,0 +1,263 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Basic XenServer CLI use &laquo; XenServer  &laquo;  Anthony Goddard &laquo; DevOps</title>
+  <meta name="author" content="Anthony Goddard">
+
+  
+  <meta name="description" content="I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer&#8217;s &#8216;xsconsole&#8217; tool &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://agoddard.github.com/XenServer/basic-xenserver-cli-use">
+  <link href="/favicon.ico" rel="icon">
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Anthony Goddard" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <h1>Anthony Goddard</h1>
+  
+    <h2><a href="/">OPS</a></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:agoddard.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="https://github.com/agoddard">Code</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Basic XenServer CLI Use</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-10T17:54:00-05:00" pubdate data-updated="true">Dec 10<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer&#8217;s &#8216;xsconsole&#8217; tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
+
+<p>User Story:</p>
+
+<p>As a sysadmin
+I need to start a XenServer guest from the command line
+so that I can start guests without having to use a GUI.</p>
+
+<p>When using Resource Pools, there is no way within the console to boot machines which are powered off - attempting to view all machines results in the error message: &#8220;This feature is unavailable in Pools with more than 100 Virtual Machines&#8221;, even if you have less than 100 virtual machines.</p>
+
+<p>Here&#8217;s where the XenServer command line applications come in handy. In order to boot a machine which is powered off, you can ssh to any machine in the pool and run <code>xe vm-list</code></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c"># xe vm-list</span>
+</span><span class='line'>uuid <span class="o">(</span> RO<span class="o">)</span>: 0ebb9d7d-1743-f9a0-f5b8-692930cc3ad0
+</span><span class='line'>name-label <span class="o">(</span> RW<span class="o">)</span>: app10
+</span><span class='line'>power-state <span class="o">(</span> RO<span class="o">)</span>: halted
+</span><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will show you all of your machines by name, state and uuid. Once you find the machine you want to boot, simply run <code>xe vm-start</code> and pass it the uuid you want to boot:
+[code lang=&#8217;bash&#8217;]
+[root@ubio-vmh07 ~]# xe vm-start uuid=0ebb9d7d-1743-f9a0-f5b8-692930cc3ad0
+[/code]</p>
+
+<p>and the machine will boot right up. You can then continue to manage the VM using xe or via the xsconsole on the host which is running the VM.</p>
+
+<p>The xe help will show you a list of available commands:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c"># xe help --all</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn"><a href="/about" title="About the author (Anthony Goddard)" rel="author">Anthony Goddard</a></span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-10T17:54:00-05:00" pubdate data-updated="true">Dec 10<span>th</span>, 2010</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/xenserver/'>XenServer</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://agoddard.github.com/XenServer/basic-xenserver-cli-use" data-via="" data-counturl="http://agoddard.github.com/XenServer/basic-xenserver-cli-use" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/Chef/querying-chef-using-the-rest-api" title="Previous Post: Querying Chef using the REST API">&laquo; Querying Chef using the REST API</a>
+      
+      
+        <a class="basic-alignment right" href="/Chef/updating-rubygems-for-chef-client-on-debian-lenny" title="next Post: Updating rubygems for chef-client on debian lenny">Updating rubygems for chef-client on debian lenny &raquo;</a>
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Anthony Goddard -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://agoddard.github.com/XenServer/basic-xenserver-cli-use';
+        var disqus_url = 'http://agoddard.github.com/XenServer/basic-xenserver-cli-use';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>

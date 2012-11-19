@@ -5,11 +5,11 @@
 <!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
 <head>
   <meta charset="utf-8">
-  <title>Anthony Goddard</title>
+  <title>Anthony Goddard &laquo; DevOps</title>
   <meta name="author" content="Anthony Goddard">
 
   
-  <meta name="description" content=" Blog Archives ">
+  <meta name="description" content="I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -31,6 +31,18 @@
 <link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
 
   
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
 
 </head>
 
@@ -53,7 +65,6 @@
 </form>
   
 <ul class="main-navigation">
-  <li><a href="/">Blog</a></li>
   <li><a href="https://github.com/agoddard">Code</a></li>
   <li><a href="/blog/archives">Archives</a></li>
 </ul>
@@ -63,6 +74,673 @@
     <div id="content">
       <div class="blog-index">
   
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/OpenStack/OpenStack-local-lvm-instance-storage">OpenStack Local LVM Instance Storage</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-17T22:28:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&#8217;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&#8217;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local LVM volumes, which is exactly what we needed. In order to configure local LVM storage for instances. I&#8217;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+
+<figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">libvirt_images_type</span><span class="o">=</span>lvm
+</span><span class='line'><span class="nv">libvirt_images_volume_group</span><span class="o">=</span>nova_local
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &#8220;nova_local&#8221; which can be done as follows.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># make sure /dev/sda1 is a free disk, formatted as &quot;Linux LVM&quot;</span>
+</span><span class='line'>pvcreate /dev/sda1 <span class="c">#create an LVM physical volume from the disk</span>
+</span><span class='line'>vgcreate nova_local /dev/sda1 <span class="c">#create the volume group</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running <code>vgs</code> should now show a &#8220;nova_local&#8221; volume group.</p>
+
+<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&#8217;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
+
+<p><strong>Update:</strong> If you&#8217;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&#8217;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
+
+<figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'> </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">- out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_path&#39;, vg,</span>
+</span><span class='line'><span class="gi">+ out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_name&#39;, vg,</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/Vagrant/vagrant">Vagrant</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-08-15T17:54:00-04:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><h4>User Story:</h4>
+
+<ul>
+<li>As a sysadmin
+
+<ul>
+<li>I want to provision virtual machines quickly and in a repeatable fashion</li>
+<li>so that I can setup test clusters in development and easily share these with others</li>
+</ul>
+</li>
+</ul>
+
+
+<p>As a sysadmin, I&#8217;m a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it&#8217;s nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout.
+Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it&#8217;s nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™.</p>
+
+<h3>Enter Vagrant</h3>
+
+<p><a href="http://vagrantup.com">Vagrant</a> is a ruby gem which performs automated building and provisioning of VirtualBox machines. Vagrant takes care of all the behind the scenes work with VirtualBox, so while you need VirtualBox installed, you technically never even need to launch the app.</p>
+
+<p><em>So what? Double clicking an app doesn&#8217;t take much time, and I get to use a nice GUI.</em></p>
+
+<p>A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here&#8217;s a simple example of getting up and running (I&#8217;ve trimmed a bit of the verbosity from the responses, but this is honestly it:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>gem install vagrant Successfully installed vagrant-0.8.2
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant box add lucid64 http://files.vagrantup.com/lucid64.box
+</span><span class='line'><span class="o">[</span>vagrant<span class="o">]</span> Downloading box: http://files.vagrantup.com/lucid64.box
+</span><span class='line'><span class="o">[</span>vagrant<span class="o">]</span> Verifying box...
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant init lucid64 create Vagrantfile
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant up
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> Importing base box <span class="s1">&#39;lucid64&#39;</span>...
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> Forwarding ports...
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> -- ssh: <span class="nv">22</span> <span class="o">=</span>&gt; 2222 <span class="o">(</span>adapter 1<span class="o">)</span>
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> VM booted and ready <span class="k">for </span>use!
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> Mounting shared folders...
+</span><span class='line'><span class="o">[</span>default<span class="o">]</span> -- v-root: /vagrant
+</span><span class='line'><span class="o">[</span>~/dev/vagrant-demo<span class="o">]</span><span class="nv">$ </span>vagrant ssh Welcome to the Ubuntu Server!
+</span><span class='line'>vagrant@lucid64:~<span class="nv">$ </span>cat /etc/issue Ubuntu 10.04.3 LTS
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So what&#8217;s actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn&#8217;t get much simpler than this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;lucid64&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Of course, simple doesn&#8217;t mean it&#8217;s lacking in ability - there&#8217;s a <a href="http://vagrantup.com/v1/docs/vagrantfile.html">whole host of configuration options</a> you can specify from simple <a href="http://vagrantup.com/v1/docs/config/vm/customize.html">ram</a> settings to <a href="http://vagrantup.com/v1/docs/provisioners.html">auto provisioning</a> with <a href="http://vagrantup.com/v1/docs/provisioners/chef_solo.html">chef</a>, <a href="http://vagrantup.com/v1/docs/provisioners/puppet.html">puppet</a> or even simple <a href="http://vagrantup.com/v1/docs/provisioners/shell.html">bash scripts</a>. Here&#8217;s an example with a few more options thrown in:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>
+</span><span class='line'><span class="no">Vagrant</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">run</span> <span class="k">do</span> <span class="o">|</span><span class="n">config</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">box</span> <span class="o">=</span> <span class="s2">&quot;lucid64&quot;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">memory_size</span> <span class="o">=</span> <span class="mi">4096</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">host_name</span> <span class="o">=</span> <span class="s1">&#39;awesome&#39;</span>
+</span><span class='line'>  <span class="n">config</span><span class="o">.</span><span class="n">vm</span><span class="o">.</span><span class="n">network</span> <span class="s2">&quot;33.33.33.105&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>What about when you&#8217;re done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I&#8217;ll suggest you check out the [docs] and see for yourself.</p>
+
+<p><em>What about security? Who made this &#8220;box&#8221; file?</em></p>
+
+<p>I hear you, but fear not. For those who want to build their own boxes, not only is this possible, but with a tool called <a href="https://github.com/jedi4ever/veewee">veewee</a>, <a href="http://twitter.com/patrickdebois">@patrickdebois</a> has made is insanely easy.
+I&#8217;ll cover that in a followup post, but rest assured, this is Not a Problem™.</p>
+
+<p>But wait, there&#8217;s more&#8230;</p>
+
+<p>You can have more than one VM in a Vagrantfile and when assigned IPs, such as in the example above, these hosts can communicate over a private, host-only network. This paves the way for setting up whole stacks / clusters on a single host, bringing dev/test-like-prod nirvana just one step closer.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0">Some Nice New Features in Chef 0.10.0</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-10T17:54:00-04:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I&#8217;d heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn&#8217;t realized how many cool features were due for release in 0.10.0 and I thought I&#8217;d mention a few of my favorite and perhaps lesser known new features here.</p>
+
+<h2>Knife Plugins</h2>
+
+<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don&#8217;t need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There&#8217;s a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
+
+<h2>Encrypted Data Bags</h2>
+
+<p>One of the first questions I get asked when talking about Chef generally relates to security. The new release being able to encrypt the contents of data bags is a big step forward on this front. This means you can now encrypt sensitive values which are stored in your data bags, such as database passwords. To keep things secure, you can also configure the decryption keys at a node level so that only nodes that should have access to the data can see it. <a href="http://twitter.com/lusis">@lusis</a> also added a <a href="https://github.com/opscode/chef/pull/77">patch</a> to support for storing decryption keys at a URL instead of a local file, a nice addition which should find its way into an upcoming release.</p>
+
+<h2>Chef Expander</h2>
+
+<p>This behind the scenes update will probably stay out of your way for the most part, but it&#8217;s cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it&#8217;s nice to know that this can scale horizontally as your infrastructure grows.</p>
+
+<h2>Cookbook Versioning</h2>
+
+<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I&#8217;d like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I&#8217;m very excited to see how this evolves as Chef moves beyond 0.10</p>
+
+<h2>Upgrading</h2>
+
+<p>If the above features aren&#8217;t a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/Chef/cookbooks-as-gems">Cookbooks as Gems.</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-05-04T17:54:00-04:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p><strong>Update:</strong> Many of the questions below have been resolved in the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">0.10.0 release of Chef</a> and Opscode have also provided a <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">great overview</a> of the current state of the community cookbooks repository.</p>
+
+<p><strong>User Story:</strong></p>
+
+<ul>
+<li>As a sysadmin
+
+<ul>
+<li>I&#8217;d like to version cookbooks and download custom cookbooks</li>
+<li>  so that I can better manage cookbook dependencies.</li>
+</ul>
+</li>
+</ul>
+
+
+<p>I&#8217;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&#8217;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &#8216;vendor&#8217; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&#8217;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
+*   &#8220;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &#8221;
+*   &#8220;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&#8217;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&#8221;
+*   &#8220;I&#8217;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&#8221; Rather than get into too much detail about those specific cases, I thought I&#8217;d provide an example of what a rubygems-esque cookbook management process might look like</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>knife cookbook install apache2 <span class="c"># installs the apache2 cookbook along with dependencies </span>
+</span><span class='line'>knife cookbook install apache2 --version<span class="o">=</span>1.02 <span class="c"># installs a legacy version of the apache2 cookbook </span>
+</span><span class='line'>knife cookbook install agoddard-apache2 <span class="c"># installs my fork of the apache2 cookbook along with dependencies </span>
+</span><span class='line'>knife cookbook install agoddard-custom_weird_app <span class="c"># installs my cookbook and dependencies for an obscure app that only I use but which I want to manage the same way </span>
+</span><span class='line'>knife cookbook install custom_weird_app <span class="c"># the above cookbook when the obscure app becomes more mainstream</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>&#8230;and how these might look in a recipe&#8230;</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;apache2&quot;</span>
+</span><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;agoddard-apache2&quot;</span>
+</span><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;apache2&quot;</span><span class="p">,</span> <span class="s2">&quot;=1.02&quot;</span>
+</span><span class='line'><span class="sx">%w{ apache2 agoddard-apache2 apache2-1.02 }</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">cb</span><span class="o">|</span>
+</span><span class='line'>  <span class="n">depends</span> <span class="n">cb</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>I&#8217;m sure there&#8217;s things I&#8217;m missing here, but I&#8217;d love to see where this concept leads.. cookbooks already support versioning but I&#8217;m not sure if there&#8217;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&#8217;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&#8217;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&#8217;t ideal, but it&#8217;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&#8217;m sure there are many other approaches to this same issue and I&#8217;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&#8217;m looking at the beginnings of something big, like github or rubygems and I&#8217;m excited to see where it goes.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/Chef/updating-rubygems-for-chef-client-on-debian-lenny">Updating Rubygems for Chef-client on Debian Lenny</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2011-01-21T17:54:00-05:00" pubdate data-updated="true">Jan 21<span>st</span>, 2011</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>User Story:</p>
+
+<p>As a sysadmin
+I need the latest rubygems package
+so that chef-client and other tools that rely on rubygems will work.</p>
+
+<p>We have a host which we needed to run chef-client on, unfortunately, the version of rubygems installed by apt was 1.2.0, which resulted in the following error:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+<span class='line-number'>9</span>
+<span class='line-number'>10</span>
+<span class='line-number'>11</span>
+<span class='line-number'>12</span>
+<span class='line-number'>13</span>
+<span class='line-number'>14</span>
+<span class='line-number'>15</span>
+<span class='line-number'>16</span>
+<span class='line-number'>17</span>
+<span class='line-number'>18</span>
+<span class='line-number'>19</span>
+<span class='line-number'>20</span>
+<span class='line-number'>21</span>
+<span class='line-number'>22</span>
+<span class='line-number'>23</span>
+<span class='line-number'>24</span>
+<span class='line-number'>25</span>
+<span class='line-number'>26</span>
+<span class='line-number'>27</span>
+<span class='line-number'>28</span>
+<span class='line-number'>29</span>
+<span class='line-number'>30</span>
+<span class='line-number'>31</span>
+<span class='line-number'>32</span>
+<span class='line-number'>33</span>
+<span class='line-number'>34</span>
+<span class='line-number'>35</span>
+<span class='line-number'>36</span>
+<span class='line-number'>37</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># chef-client</span>
+</span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:43 +0000<span class="o">]</span> INFO: Starting Chef Run <span class="o">(</span>Version 0.9.12<span class="o">)</span>
+</span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:43 +0000<span class="o">]</span> WARN: Missing gem <span class="s1">&#39;mysql&#39;</span>
+</span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:44 +0000<span class="o">]</span> ERROR: Running exception handlers
+</span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:44 +0000<span class="o">]</span> ERROR: Exception handlers <span class="nb">complete</span>
+</span><span class='line'>/usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:89:in <span class="sb">`</span>with_gem_sources<span class="s1">&#39;: undefined method `sources=&#39;</span> <span class="k">for </span>Gem:Module <span class="o">(</span>NoMethodError<span class="o">)</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:206:in <span class="sb">`</span>candidate_version_from_remote<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:373:in `candidate_version&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/provider/package.rb:44:in <span class="sb">`</span>action_install<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/resource.rb:395:in `send&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/resource.rb:395:in <span class="sb">`</span>run_action<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /var/cache/chef/cookbooks/mysql/recipes/client.rb:62:in `from_file&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/cookbook_version.rb:472:in <span class="sb">`</span>load_recipe<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:40:in `include_recipe&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:27:in <span class="sb">`</span>each<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:27:in `include_recipe&#39;</span>
+</span><span class='line'>from /var/cache/chef/cookbooks/mysql/recipes/server.rb:20:in <span class="sb">`</span>from_file<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/cookbook_version.rb:472:in `load_recipe&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:40:in <span class="sb">`</span>include_recipe<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:27:in `each&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:27:in <span class="sb">`</span>include_recipe<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /var/cache/chef/cookbooks/drupal/recipes/default.rb:23:in `from_file&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/cookbook_version.rb:472:in <span class="sb">`</span>load_recipe<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:40:in `include_recipe&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:27:in <span class="sb">`</span>each<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/mixin/language_include_recipe.rb:27:in `include_recipe&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/run_context.rb:94:in <span class="sb">`</span>load<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/run_context.rb:91:in `each&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/run_context.rb:91:in <span class="sb">`</span>load<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/run_context.rb:55:in `initialize&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/client.rb:166:in <span class="sb">`</span>new<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/client.rb:166:in `run&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/application/client.rb:222:in <span class="sb">`</span>run_application<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/application/client.rb:212:in `loop&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/application/client.rb:212:in <span class="sb">`</span>run_application<span class="s1">&#39;</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/application.rb:62:in `run&#39;</span>
+</span><span class='line'>from /usr/bin/chef-client:26
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>A quick post to the opscode discussion forum (actually the wrong forum but jtimberman was kind enough to help out) told us that the error was the result of the outdated rubygems package. The easy solution was to simply use rubygem&#8217;s own self-updating mechanism by running <code>gem update --system</code>. Easy enough, however the version installed by apt doesn&#8217;t actually permit this:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ERROR:  While executing gem ... <span class="o">(</span>RuntimeError<span class="o">)</span>
+</span><span class='line'>    gem update --system is disabled on Debian. RubyGems can be updated using the official Debian repositories by aptitude or apt-get.
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>At this point we could have introduced new apt sources to see if they contained more recent versions, but we decided we really wanted rubygems to be able to update itself. Rather than reinstall rubygems from source, we found that there was a rubygem on rubygems.org for exactly this purpose &#8220;rubygems-update&#8221;. Unfortunately for some reason, perhaps an incompatibility between rubygems 1.2.0 and rubygems.org, even after adding rubygems.org as a gem source, gem complained it was unable to find the repository online. Downloading the gem and installing it locally provided the fix for that:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+<span class='line-number'>8</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>gem -v
+</span><span class='line'><span class="c">#1.2.0</span>
+</span><span class='line'>wget http://production.cf.rubygems.org/gems/rubygems-update-1.4.2.gem
+</span><span class='line'>gem install rubygems-update-1.4.2.gem --local
+</span><span class='line'><span class="nb">cd</span> /var/lib/gems/1.8/bin
+</span><span class='line'>./update_rubygems
+</span><span class='line'>gem -v
+</span><span class='line'><span class="c"># 1.4.2</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Problem solved. With the new version of rubygems installed, we&#8217;re now able to run gem update &#8211;system to stay up to date.</p>
+
+<p>I believe rubygems was originally installed as a dependency of the chef package in the opscode apt repo, and the rubygems version in there is 1.2.0. So it appears that this problem would always occur when bootstrapping a new debian lenny machine with chef-client using only the apt packages, so I&#8217;ll be switching to bootstrapping via the chef gems rather than using apt. I&#8217;ll pose this question to the smart folks at opscode though and see if there isn&#8217;t a simple answer to the package dependency issue.</p>
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/XenServer/basic-xenserver-cli-use">Basic XenServer CLI Use</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-10T17:54:00-05:00" pubdate data-updated="true">Dec 10<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer&#8217;s &#8216;xsconsole&#8217; tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
+
+<p>User Story:</p>
+
+<p>As a sysadmin
+I need to start a XenServer guest from the command line
+so that I can start guests without having to use a GUI.</p>
+
+<p>When using Resource Pools, there is no way within the console to boot machines which are powered off - attempting to view all machines results in the error message: &#8220;This feature is unavailable in Pools with more than 100 Virtual Machines&#8221;, even if you have less than 100 virtual machines.</p>
+
+<p>Here&#8217;s where the XenServer command line applications come in handy. In order to boot a machine which is powered off, you can ssh to any machine in the pool and run <code>xe vm-list</code></p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c"># xe vm-list</span>
+</span><span class='line'>uuid <span class="o">(</span> RO<span class="o">)</span>: 0ebb9d7d-1743-f9a0-f5b8-692930cc3ad0
+</span><span class='line'>name-label <span class="o">(</span> RW<span class="o">)</span>: app10
+</span><span class='line'>power-state <span class="o">(</span> RO<span class="o">)</span>: halted
+</span><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c">#</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>This will show you all of your machines by name, state and uuid. Once you find the machine you want to boot, simply run <code>xe vm-start</code> and pass it the uuid you want to boot:
+[code lang=&#8217;bash&#8217;]
+[root@ubio-vmh07 ~]# xe vm-start uuid=0ebb9d7d-1743-f9a0-f5b8-692930cc3ad0
+[/code]</p>
+
+<p>and the machine will boot right up. You can then continue to manage the VM using xe or via the xsconsole on the host which is running the VM.</p>
+
+<p>The xe help will show you a list of available commands:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c"># xe help --all</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+  
+  
+
+
+    </article>
+  
+  
+    <article>
+      
+  <header>
+    
+      <h1 class="entry-title"><a href="/Chef/querying-chef-using-the-rest-api">Querying Chef Using the REST API</a></h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2010-12-09T17:54:00-05:00" pubdate data-updated="true">Dec 9<span>th</span>, 2010</time>
+        
+      </p>
+    
+  </header>
+
+
+  <div class="entry-content"><p>Assumptions: You have a working knife configuration.</p>
+
+<p>The initial user story that prompted me to figure out how to interact with Chef Server REST API was this:</p>
+
+<ul>
+<li>As a System Administrator</li>
+<li>  I want to be able to see what IP addresses are being used</li>
+<li>  In order for me to correctly assign a free IP to a new machine.</li>
+</ul>
+
+
+<p>In order to access the Chef Server programmatically I first had to figure out authentication. Unfortunately, I couldn&#8217;t find any good examples of how to actually do this. The Chef Server API wiki page has some basic requirements and concepts, but no concrete examples.</p>
+
+<p>However, it gave me a good starting place&#8211;the Chef::REST library. The REST library that comes bundled with Chef in every version > 0.9.0. Let&#8217;s just make sure that we actually have that version:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>knife --version
+</span><span class='line'>Chef: 0.9.12
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now that we know the version is ok we’re basically done. All we have to do is load the knife configuration file and then we can use the built in rest library. Here’s the code I ended up with:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+<span class='line-number'>7</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;bundler/setup&#39;</span>
+</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;chef&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="no">Chef</span><span class="o">::</span><span class="no">Config</span><span class="o">.</span><span class="n">from_file</span><span class="p">(</span><span class="s2">&quot;/path/to/knife.rb&quot;</span><span class="p">)</span>
+</span><span class='line'><span class="n">rest</span> <span class="o">=</span> <span class="no">Chef</span><span class="o">::</span><span class="no">REST</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="err">“</span><span class="n">http</span><span class="ss">:/</span><span class="o">/</span><span class="n">host</span><span class="ss">:port</span><span class="err">”</span><span class="p">)</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">nodes</span> <span class="o">=</span> <span class="n">rest</span><span class="o">.</span><span class="n">get_rest</span><span class="p">(</span><span class="err">“</span><span class="o">/</span><span class="n">nodes</span><span class="err">”</span><span class="p">)</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Now you can do something like:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">nodes</span><span class="o">.</span><span class="n">keys</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">key</span><span class="o">|</span>
+</span><span class='line'>  <span class="nb">puts</span> <span class="n">rest</span><span class="o">.</span><span class="n">get_rest</span><span class="p">(</span><span class="err">“</span><span class="o">/</span><span class="n">nodes</span><span class="o">/</span><span class="c1">#{key}”)[:name]</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>So now we just print each IP address that is being used and we can figure out the next free IP address in any given range. That completes this user story!</p>
+
+<p>There was only one gotcha in the whole process. Trying to print a node just throws an ArgumentError:</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">puts</span> <span class="n">node</span> <span class="c1">#=&gt; ArgumentError: Attribute to_ary is not defined!</span>
+</span></code></pre></td></tr></table></div></figure>
+
+</div>
+  
+  
+
+
+    </article>
   
   <div class="pagination">
     
@@ -81,9 +759,30 @@
 </footer>
   
 
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        var disqus_script = 'count.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
 
 
 
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
 
 
 

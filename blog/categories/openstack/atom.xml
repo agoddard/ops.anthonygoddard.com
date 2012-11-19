@@ -1,0 +1,60 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+
+  <title><![CDATA[Category: OpenStack | Anthony Goddard]]></title>
+  <link href="http://agoddard.github.com/blog/categories/openstack/atom.xml" rel="self"/>
+  <link href="http://agoddard.github.com/"/>
+  <updated>2012-11-18T23:35:05-05:00</updated>
+  <id>http://agoddard.github.com/</id>
+  <author>
+    <name><![CDATA[Anthony Goddard]]></name>
+    
+  </author>
+  <generator uri="http://octopress.org/">Octopress</generator>
+
+  
+  <entry>
+    <title type="html"><![CDATA[OpenStack Local LVM instance storage]]></title>
+    <link href="http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage"/>
+    <updated>2012-11-17T22:28:00-05:00</updated>
+    <id>http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage</id>
+    <content type="html"><![CDATA[<p>I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local LVM volumes, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">libvirt_images_type</span><span class="o">=</span>lvm
+</span><span class='line'><span class="nv">libvirt_images_volume_group</span><span class="o">=</span>nova_local
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called "nova_local" which can be done as follows.</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+<span class='line-number'>6</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;h1&gt;make sure /dev/sda1 is a free disk, formatted as <span class="s2">&quot;Linux LVM&quot;</span>&lt;/h1&gt;
+</span><span class='line'>
+</span><span class='line'>&lt;p&gt;pvcreate /dev/sda1 <span class="c">#create an LVM physical volume from the disk</span>
+</span><span class='line'>vgcreate nova_local /dev/sda1 <span class="c">#create the volume group</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+
+<p>Running <code>vgs</code> should now show a "nova_local" volume group.</p>
+
+<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren't any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
+
+<p><strong>Update:</strong> If you're running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there's a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
+
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'> </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">- out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_path&#39;, vg,</span>
+</span><span class='line'><span class="gi">+ out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_name&#39;, vg,</span>
+</span></code></pre></td></tr></table></div></figure></notextile></div></p>
+]]></content>
+  </entry>
+  
+</feed>

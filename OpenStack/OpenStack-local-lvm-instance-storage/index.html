@@ -1,0 +1,256 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>OpenStack Local LVM instance storage &laquo; OpenStack  &laquo;  Anthony Goddard &laquo; DevOps</title>
+  <meta name="author" content="Anthony Goddard">
+
+  
+  <meta name="description" content="I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage">
+  <link href="/favicon.ico" rel="icon">
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Anthony Goddard" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <h1>Anthony Goddard</h1>
+  
+    <h2><a href="/">OPS</a></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:agoddard.github.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="https://github.com/agoddard">Code</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">OpenStack Local LVM Instance Storage</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-17T22:28:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&#8217;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&#8217;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local LVM volumes, which is exactly what we needed. In order to configure local LVM storage for instances. I&#8217;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+
+<figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">libvirt_images_type</span><span class="o">=</span>lvm
+</span><span class='line'><span class="nv">libvirt_images_volume_group</span><span class="o">=</span>nova_local
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &#8220;nova_local&#8221; which can be done as follows.</p>
+
+<figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="c"># make sure /dev/sda1 is a free disk, formatted as &quot;Linux LVM&quot;</span>
+</span><span class='line'>pvcreate /dev/sda1 <span class="c">#create an LVM physical volume from the disk</span>
+</span><span class='line'>vgcreate nova_local /dev/sda1 <span class="c">#create the volume group</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<p>Running <code>vgs</code> should now show a &#8220;nova_local&#8221; volume group.</p>
+
+<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&#8217;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
+
+<p><strong>Update:</strong> If you&#8217;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&#8217;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
+
+<figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'> </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">- out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_path&#39;, vg,</span>
+</span><span class='line'><span class="gi">+ out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_name&#39;, vg,</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn"><a href="/about" title="About the author (Anthony Goddard)" rel="author">Anthony Goddard</a></span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2012-11-17T22:28:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/openstack/'>OpenStack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage" data-via="" data-counturl="http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/Vagrant/vagrant" title="Previous Post: Vagrant">&laquo; Vagrant</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2012 - Anthony Goddard -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage';
+        var disqus_url = 'http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
