@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Vagrant | Anthony Goddard]]></title>
-  <link href="http://agoddard.github.com/blog/categories/vagrant/atom.xml" rel="self"/>
-  <link href="http://agoddard.github.com/"/>
-  <updated>2012-12-14T17:46:21-05:00</updated>
-  <id>http://agoddard.github.com/</id>
+  <link href="http://ops.anthonygoddard.com/blog/categories/vagrant/atom.xml" rel="self"/>
+  <link href="http://ops.anthonygoddard.com/"/>
+  <updated>2013-01-09T13:50:13-05:00</updated>
+  <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Vagrant]]></title>
-    <link href="http://agoddard.github.com/Vagrant/vagrant"/>
+    <link href="http://ops.anthonygoddard.com/Vagrant/vagrant"/>
     <updated>2011-08-15T17:54:00-04:00</updated>
-    <id>http://agoddard.github.com/Vagrant/vagrant</id>
+    <id>http://ops.anthonygoddard.com/Vagrant/vagrant</id>
     <content type="html"><![CDATA[<h4>User Story:</h4>
 
 <ul>

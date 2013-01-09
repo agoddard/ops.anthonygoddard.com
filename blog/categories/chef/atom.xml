@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: Chef | Anthony Goddard]]></title>
-  <link href="http://agoddard.github.com/blog/categories/chef/atom.xml" rel="self"/>
-  <link href="http://agoddard.github.com/"/>
-  <updated>2012-12-14T17:46:21-05:00</updated>
-  <id>http://agoddard.github.com/</id>
+  <link href="http://ops.anthonygoddard.com/blog/categories/chef/atom.xml" rel="self"/>
+  <link href="http://ops.anthonygoddard.com/"/>
+  <updated>2013-01-09T13:50:13-05:00</updated>
+  <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Some nice new features in Chef 0.10.0]]></title>
-    <link href="http://agoddard.github.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0"/>
+    <link href="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0"/>
     <updated>2011-05-10T17:54:00-04:00</updated>
-    <id>http://agoddard.github.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0</id>
+    <id>http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0</id>
     <content type="html"><![CDATA[<p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I'd heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn't realized how many cool features were due for release in 0.10.0 and I thought I'd mention a few of my favorite and perhaps lesser known new features here.</p>
 
 <h2>Knife Plugins</h2>
@@ -44,9 +44,9 @@
   
   <entry>
     <title type="html"><![CDATA[Cookbooks as gems.]]></title>
-    <link href="http://agoddard.github.com/Chef/cookbooks-as-gems"/>
+    <link href="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems"/>
     <updated>2011-05-04T17:54:00-04:00</updated>
-    <id>http://agoddard.github.com/Chef/cookbooks-as-gems</id>
+    <id>http://ops.anthonygoddard.com/Chef/cookbooks-as-gems</id>
     <content type="html"><![CDATA[<p><strong>Update:</strong> Many of the questions below have been resolved in the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">0.10.0 release of Chef</a> and Opscode have also provided a <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">great overview</a> of the current state of the community cookbooks repository.</p>
 
 <p><strong>User Story:</strong></p>
@@ -97,9 +97,9 @@ I'm sure there's things I'm missing here, but I'd love to see where this concept
   
   <entry>
     <title type="html"><![CDATA[Updating rubygems for chef-client on debian lenny]]></title>
-    <link href="http://agoddard.github.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny"/>
+    <link href="http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny"/>
     <updated>2011-01-21T17:54:00-05:00</updated>
-    <id>http://agoddard.github.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny</id>
+    <id>http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny</id>
     <content type="html"><![CDATA[<p>User Story:</p>
 
 <p>As a sysadmin
@@ -238,9 +238,9 @@ Problem solved. With the new version of rubygems installed, we're now able to ru
   
   <entry>
     <title type="html"><![CDATA[Querying Chef using the REST API]]></title>
-    <link href="http://agoddard.github.com/Chef/querying-chef-using-the-rest-api"/>
+    <link href="http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api"/>
     <updated>2010-12-09T17:54:00-05:00</updated>
-    <id>http://agoddard.github.com/Chef/querying-chef-using-the-rest-api</id>
+    <id>http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api</id>
     <content type="html"><![CDATA[<p>Assumptions: You have a working knife configuration.</p>
 
 <p>The initial user story that prompted me to figure out how to interact with Chef Server REST API was this:</p>

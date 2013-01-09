@@ -2,10 +2,10 @@
 <feed xmlns="http://www.w3.org/2005/Atom">
 
   <title><![CDATA[Category: XenServer | Anthony Goddard]]></title>
-  <link href="http://agoddard.github.com/blog/categories/xenserver/atom.xml" rel="self"/>
-  <link href="http://agoddard.github.com/"/>
-  <updated>2012-12-14T17:46:21-05:00</updated>
-  <id>http://agoddard.github.com/</id>
+  <link href="http://ops.anthonygoddard.com/blog/categories/xenserver/atom.xml" rel="self"/>
+  <link href="http://ops.anthonygoddard.com/"/>
+  <updated>2013-01-09T13:50:13-05:00</updated>
+  <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
     
@@ -15,9 +15,9 @@
   
   <entry>
     <title type="html"><![CDATA[Basic XenServer CLI use]]></title>
-    <link href="http://agoddard.github.com/XenServer/basic-xenserver-cli-use"/>
+    <link href="http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use"/>
     <updated>2010-12-10T17:54:00-05:00</updated>
-    <id>http://agoddard.github.com/XenServer/basic-xenserver-cli-use</id>
+    <id>http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use</id>
     <content type="html"><![CDATA[<p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer's 'xsconsole' tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
 
 <p>User Story:</p>

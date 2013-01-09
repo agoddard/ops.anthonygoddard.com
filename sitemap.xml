@@ -1,45 +1,47 @@
 <?xml version='1.0' encoding='UTF-8'?>
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
-        <loc>http://agoddard.github.com/Chef/querying-chef-using-the-rest-api</loc>
+        <loc>http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api</loc>
         <lastmod>2012-11-18T23:25:21-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/XenServer/basic-xenserver-cli-use</loc>
+        <loc>http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use</loc>
         <lastmod>2012-11-18T23:25:03-05:00</lastmod>
     </url>
     <url>
         <loc>
-            http://agoddard.github.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny
+            http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny
         </loc>
         <lastmod>2012-11-18T23:25:15-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/Chef/cookbooks-as-gems</loc>
+        <loc>http://ops.anthonygoddard.com/Chef/cookbooks-as-gems</loc>
         <lastmod>2012-11-18T23:25:07-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0</loc>
+        <loc>
+            http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0
+        </loc>
         <lastmod>2012-11-18T23:25:11-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/Vagrant/vagrant</loc>
+        <loc>http://ops.anthonygoddard.com/Vagrant/vagrant</loc>
         <lastmod>2012-11-18T23:28:13-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/OpenStack/OpenStack-local-lvm-instance-storage</loc>
+        <loc>http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage</loc>
         <lastmod>2012-12-14T17:46:17-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/404.html</loc>
+        <loc>http://ops.anthonygoddard.com/404.html</loc>
         <lastmod>2012-11-17T23:45:12-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/blog/archives/</loc>
+        <loc>http://ops.anthonygoddard.com/blog/archives/</loc>
         <lastmod>2012-12-14T17:46:17-05:00</lastmod>
     </url>
     <url>
-        <loc>http://agoddard.github.com/</loc>
+        <loc>http://ops.anthonygoddard.com/</loc>
         <lastmod>2012-12-14T17:46:17-05:00</lastmod>
     </url>
 </urlset>
