@@ -10,7 +10,6 @@ document_root  = "~/website.com/"
 rsync_delete   = false
 deploy_default = "push"
 rsync_args     = ""  # Any extra arguments to pass to rsync
-deploy_default = "rsync"
 
 # This will be configured for you when you run config_deploy
 deploy_branch  = "gh-pages"
