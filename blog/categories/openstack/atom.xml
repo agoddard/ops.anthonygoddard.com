@@ -4,7 +4,7 @@
   <title><![CDATA[Category: OpenStack | Anthony Goddard]]></title>
   <link href="http://ops.anthonygoddard.com/blog/categories/openstack/atom.xml" rel="self"/>
   <link href="http://ops.anthonygoddard.com/"/>
-  <updated>2013-01-09T13:50:13-05:00</updated>
+  <updated>2013-01-22T09:05:53-05:00</updated>
   <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -14,10 +14,177 @@
 
   
   <entry>
+    <title type="html"><![CDATA[Demystifying OpenStack Folsom quotas]]></title>
+    <link href="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas"/>
+    <updated>2013-01-22T00:04:00-05:00</updated>
+    <id>http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas</id>
+    <content type="html"><![CDATA[<p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you're not careful, both in Nova and in Cinder.</p>
+
+<h1>Nova Quotas</h1>
+
+<p>When setting quotas for users or tenants in Folsom, you need to specify the UUID of the user/tenant.</p>
+
+<pre><code>agoddard@control1:~# keystone tenant-list
++----------------------------------+---------+---------+
+|                id                |   name  | enabled |
++----------------------------------+---------+---------+
+| 040113b0d7824477aacf4ce39df69344 | service |   True  |
+| 9af32c41cee140779d50afb2bc93e322 |   ops   |   True  |
++----------------------------------+---------+---------+
+
+agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
++-----------------------------+--------+
+| Property                    | Value  |
++-----------------------------+--------+
+| cores                       | 500    |
+| floating_ips                | 100    |
+| gigabytes                   | 50000  |
+| injected_file_content_bytes | 10240  |
+| injected_files              | 5      |
+| instances                   | 500    |
+| metadata_items              | 128    |
+| ram                         | 200000 |
+| volumes                     | 5000   |
++-----------------------------+--------+
+</code></pre>
+
+<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won't actually reference the tenant (or any tenant for that matter):</p>
+
+<pre><code>agoddard@control1:~# nova quota-show ops
++-----------------------------+-------+
+| Property                    | Value |
++-----------------------------+-------+
+| cores                       | 500   |
+| floating_ips                | 10    |
+| gigabytes                   | 50000 |
+| injected_file_content_bytes | 10240 |
+| injected_files              | 5     |
+| instances                   | 500   |
+| metadata_items              | 128   |
+| ram                         | 51200 |
+| volumes                     | 10    |
++-----------------------------+-------+
+</code></pre>
+
+<p>As you can see, floating IPs, ram and volumes are all different when using the name rather than UUID.</p>
+
+<p>It get's a little stranger - what if we just make up a tenant:</p>
+
+<pre><code>agoddard@control1:~# nova quota-show nonexistent-tenant
++-----------------------------+-------+
+| Property                    | Value |
++-----------------------------+-------+
+| cores                       | 20    |
+| floating_ips                | 10    |
+| gigabytes                   | 1000  |
+| injected_file_content_bytes | 10240 |
+| injected_files              | 5     |
+| instances                   | 10    |
+| metadata_items              | 128   |
+| ram                         | 51200 |
+| volumes                     | 10    |
++-----------------------------+-------+
+agoddard@control1:~# nova quota-update nonexistent-tenant --cores 100
+agoddard@control1:~# nova quota-show nonexistent-tenant
++-----------------------------+-------+
+| Property                    | Value |
++-----------------------------+-------+
+| cores                       | 100   |
+| floating_ips                | 10    |
+| gigabytes                   | 1000  |
+| injected_file_content_bytes | 10240 |
+| injected_files              | 5     |
+| instances                   | 10    |
+| metadata_items              | 128   |
+| ram                         | 51200 |
+| volumes                     | 10    |
++-----------------------------+-------+
+</code></pre>
+
+<p>Nova created an entry for the tenant, even though the tenant doesn't exist. This is what makes it appear that a change has been made when it hasn't, and without an error being thrown, things can get pretty confusing.</p>
+
+<p><strong>Long story short, always use the UUID of a tenant when setting quotas.</strong></p>
+
+<h1>Cinder Quotas</h1>
+
+<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID's wouldn't work for me.</p>
+
+<p>First, we can check the tenant's quota, which is 50TB:</p>
+
+<pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
++-----------------------------+--------+
+| Property                    | Value  |
++-----------------------------+--------+
+| cores                       | 500    |
+| floating_ips                | 100    |
+| gigabytes                   | 50000  |
+| injected_file_content_bytes | 10240  |
+| injected_files              | 5      |
+| instances                   | 500    |
+| metadata_items              | 128    |
+| ram                         | 200000 |
+| volumes                     | 5000   |
++-----------------------------+--------+
+</code></pre>
+
+<p>Now, we simply increase the quota, remembering to use the UUID so the change takes effect.</p>
+
+<pre><code>agoddard@control1:~# nova quota-update 9af32c41cee140779d50afb2bc93e322 --gigabytes 60000
+</code></pre>
+
+<p>And we can confirm the change:</p>
+
+<pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
++-----------------------------+--------+
+| Property                    | Value  |
++-----------------------------+--------+
+| cores                       | 500    |
+| floating_ips                | 100    |
+| gigabytes                   | 60000  |
+| injected_file_content_bytes | 10240  |
+| injected_files              | 5      |
+| instances                   | 500    |
+| metadata_items              | 128    |
+| ram                         | 200000 |
+| volumes                     | 5000   |
++-----------------------------+--------+
+</code></pre>
+
+<p>It appears like everything is fine, however when I try to add additional volume space about 50TB, I get an API error about exceeding my quota, and Horizon shows the quota as 50TB.
+By checking the quota with the <code>cinder</code> command, we can see that the quota update didn't actually have any effect at all:</p>
+
+<pre><code>agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
++-----------+-------+
+|  Property | Value |
++-----------+-------+
+| gigabytes | 50000 |
+|  volumes  |   10  |
++-----------+-------+
+</code></pre>
+
+<p>By running <code>cinder quota-update</code> rather than <code>nova quota-update</code>, the correct quota is set:</p>
+
+<pre><code>agoddard@control1:~# cinder quota-update 9af32c41cee140779d50afb2bc93e322 --gigabytes=60000
+agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
++-----------+-------+
+|  Property | Value |
++-----------+-------+
+| gigabytes | 60000 |
+|  volumes  |   10  |
++-----------+-------+
+</code></pre>
+
+<p><strong>Long story short, when setting Cinder quotas, always use <code>cinder quota-update</code>, and not <code>nova quota-update</code></strong>.</p>
+
+<p>Both of the above issues seem to be artifacts from changes that Folsom brought about, such as separating volumes from nova. A bugfix for the wrong quota being shown in horizon has been <a href="https://bugs.launchpad.net/horizon/+bug/1095876">accepted</a> for the <a href="https://launchpad.net/horizon/+milestone/grizzly-3">Grizzly-3 milestone</a>, due on Feb 21.</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[OpenStack Local LVM instance storage]]></title>
-    <link href="http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage"/>
+    <link href="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage"/>
     <updated>2012-11-17T22:28:00-05:00</updated>
-    <id>http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage</id>
+    <id>http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage</id>
     <content type="html"><![CDATA[<p>I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
@@ -49,7 +216,7 @@
 
 <p><strong>Update:</strong> If you're running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there's a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'> </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">- out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_path&#39;, vg,</span>
 </span><span class='line'><span class="gi">+ out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_name&#39;, vg,</span>

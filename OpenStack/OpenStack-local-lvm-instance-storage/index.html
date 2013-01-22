@@ -18,7 +18,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
   
-  <link rel="canonical" href="http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage">
+  <link rel="canonical" href="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage">
   <link href="/favicon.ico" rel="icon">
   
   <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
@@ -127,7 +127,7 @@
 
 <p><strong>Update:</strong> If you&#8217;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&#8217;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
 
-<figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'> </a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">- out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_path&#39;, vg,</span>
 </span><span class='line'><span class="gi">+ out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_name&#39;, vg,</span>
@@ -171,7 +171,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage" data-via="" data-counturl="http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage" data-via="" data-counturl="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>
@@ -184,6 +184,8 @@
       
         <a class="basic-alignment left" href="/Vagrant/vagrant" title="Previous Post: Vagrant">&laquo; Vagrant</a>
       
+      
+        <a class="basic-alignment right" href="/OpenStack/demystifying-openstack-folsom-quotas" title="next Post: Demystifying OpenStack Folsom quotas">Demystifying OpenStack Folsom quotas &raquo;</a>
       
     </p>
   </footer>
@@ -213,8 +215,8 @@
       
         
         // var disqus_developer = 1;
-        var disqus_identifier = 'http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage';
-        var disqus_url = 'http://ops.anthonygoddard.com/OpenStack/OpenStack-local-lvm-instance-storage';
+        var disqus_identifier = 'http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage';
+        var disqus_url = 'http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage';
         var disqus_script = 'embed.js';
       
     (function () {

@@ -1,0 +1,380 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>Demystifying OpenStack Folsom quotas &laquo; OpenStack  &laquo;  Anthony Goddard &laquo; DevOps</title>
+  <meta name="author" content="Anthony Goddard">
+
+  
+  <meta name="description" content="With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&#8217;re not careful, both in Nova and in &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas">
+  <link href="/favicon.ico" rel="icon">
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Anthony Goddard" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <h1>Anthony Goddard</h1>
+  
+    <h2><a href="/">OPS</a></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ops.anthonygoddard.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="https://github.com/agoddard">Code</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">Demystifying OpenStack Folsom Quotas</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-22T00:04:00-05:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&#8217;re not careful, both in Nova and in Cinder.</p>
+
+<h1>Nova Quotas</h1>
+
+<p>When setting quotas for users or tenants in Folsom, you need to specify the UUID of the user/tenant.</p>
+
+<pre><code>agoddard@control1:~# keystone tenant-list
++----------------------------------+---------+---------+
+|                id                |   name  | enabled |
++----------------------------------+---------+---------+
+| 040113b0d7824477aacf4ce39df69344 | service |   True  |
+| 9af32c41cee140779d50afb2bc93e322 |   ops   |   True  |
++----------------------------------+---------+---------+
+
+agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
++-----------------------------+--------+
+| Property                    | Value  |
++-----------------------------+--------+
+| cores                       | 500    |
+| floating_ips                | 100    |
+| gigabytes                   | 50000  |
+| injected_file_content_bytes | 10240  |
+| injected_files              | 5      |
+| instances                   | 500    |
+| metadata_items              | 128    |
+| ram                         | 200000 |
+| volumes                     | 5000   |
++-----------------------------+--------+
+</code></pre>
+
+<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won&#8217;t actually reference the tenant (or any tenant for that matter):</p>
+
+<pre><code>agoddard@control1:~# nova quota-show ops
++-----------------------------+-------+
+| Property                    | Value |
++-----------------------------+-------+
+| cores                       | 500   |
+| floating_ips                | 10    |
+| gigabytes                   | 50000 |
+| injected_file_content_bytes | 10240 |
+| injected_files              | 5     |
+| instances                   | 500   |
+| metadata_items              | 128   |
+| ram                         | 51200 |
+| volumes                     | 10    |
++-----------------------------+-------+
+</code></pre>
+
+<p>As you can see, floating IPs, ram and volumes are all different when using the name rather than UUID.</p>
+
+<p>It get&#8217;s a little stranger - what if we just make up a tenant:</p>
+
+<pre><code>agoddard@control1:~# nova quota-show nonexistent-tenant
++-----------------------------+-------+
+| Property                    | Value |
++-----------------------------+-------+
+| cores                       | 20    |
+| floating_ips                | 10    |
+| gigabytes                   | 1000  |
+| injected_file_content_bytes | 10240 |
+| injected_files              | 5     |
+| instances                   | 10    |
+| metadata_items              | 128   |
+| ram                         | 51200 |
+| volumes                     | 10    |
++-----------------------------+-------+
+agoddard@control1:~# nova quota-update nonexistent-tenant --cores 100
+agoddard@control1:~# nova quota-show nonexistent-tenant
++-----------------------------+-------+
+| Property                    | Value |
++-----------------------------+-------+
+| cores                       | 100   |
+| floating_ips                | 10    |
+| gigabytes                   | 1000  |
+| injected_file_content_bytes | 10240 |
+| injected_files              | 5     |
+| instances                   | 10    |
+| metadata_items              | 128   |
+| ram                         | 51200 |
+| volumes                     | 10    |
++-----------------------------+-------+
+</code></pre>
+
+<p>Nova created an entry for the tenant, even though the tenant doesn&#8217;t exist. This is what makes it appear that a change has been made when it hasn&#8217;t, and without an error being thrown, things can get pretty confusing.</p>
+
+<p><strong>Long story short, always use the UUID of a tenant when setting quotas.</strong></p>
+
+<h1>Cinder Quotas</h1>
+
+<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID&#8217;s wouldn&#8217;t work for me.</p>
+
+<p>First, we can check the tenant&#8217;s quota, which is 50TB:</p>
+
+<pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
++-----------------------------+--------+
+| Property                    | Value  |
++-----------------------------+--------+
+| cores                       | 500    |
+| floating_ips                | 100    |
+| gigabytes                   | 50000  |
+| injected_file_content_bytes | 10240  |
+| injected_files              | 5      |
+| instances                   | 500    |
+| metadata_items              | 128    |
+| ram                         | 200000 |
+| volumes                     | 5000   |
++-----------------------------+--------+
+</code></pre>
+
+<p>Now, we simply increase the quota, remembering to use the UUID so the change takes effect.</p>
+
+<pre><code>agoddard@control1:~# nova quota-update 9af32c41cee140779d50afb2bc93e322 --gigabytes 60000
+</code></pre>
+
+<p>And we can confirm the change:</p>
+
+<pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
++-----------------------------+--------+
+| Property                    | Value  |
++-----------------------------+--------+
+| cores                       | 500    |
+| floating_ips                | 100    |
+| gigabytes                   | 60000  |
+| injected_file_content_bytes | 10240  |
+| injected_files              | 5      |
+| instances                   | 500    |
+| metadata_items              | 128    |
+| ram                         | 200000 |
+| volumes                     | 5000   |
++-----------------------------+--------+
+</code></pre>
+
+<p>It appears like everything is fine, however when I try to add additional volume space about 50TB, I get an API error about exceeding my quota, and Horizon shows the quota as 50TB.
+By checking the quota with the <code>cinder</code> command, we can see that the quota update didn&#8217;t actually have any effect at all:</p>
+
+<pre><code>agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
++-----------+-------+
+|  Property | Value |
++-----------+-------+
+| gigabytes | 50000 |
+|  volumes  |   10  |
++-----------+-------+
+</code></pre>
+
+<p>By running <code>cinder quota-update</code> rather than <code>nova quota-update</code>, the correct quota is set:</p>
+
+<pre><code>agoddard@control1:~# cinder quota-update 9af32c41cee140779d50afb2bc93e322 --gigabytes=60000
+agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
++-----------+-------+
+|  Property | Value |
++-----------+-------+
+| gigabytes | 60000 |
+|  volumes  |   10  |
++-----------+-------+
+</code></pre>
+
+<p><strong>Long story short, when setting Cinder quotas, always use <code>cinder quota-update</code>, and not <code>nova quota-update</code></strong>.</p>
+
+<p>Both of the above issues seem to be artifacts from changes that Folsom brought about, such as separating volumes from nova. A bugfix for the wrong quota being shown in horizon has been <a href="https://bugs.launchpad.net/horizon/+bug/1095876">accepted</a> for the <a href="https://launchpad.net/horizon/+milestone/grizzly-3">Grizzly-3 milestone</a>, due on Feb 21.</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn"><a href="/about" title="About the author (Anthony Goddard)" rel="author">Anthony Goddard</a></span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-01-22T00:04:00-05:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2013</time>
+      
+
+<span class="categories">
+  
+    <a class='category' href='/blog/categories/openstack/'>OpenStack</a>
+  
+</span>
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas" data-via="" data-counturl="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/OpenStack/openstack-local-lvm-instance-storage" title="Previous Post: OpenStack Local LVM instance storage">&laquo; OpenStack Local LVM instance storage</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Anthony Goddard -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas';
+        var disqus_url = 'http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
