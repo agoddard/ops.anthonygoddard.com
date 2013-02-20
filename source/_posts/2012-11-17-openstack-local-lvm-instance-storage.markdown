@@ -6,7 +6,7 @@ comments: true
 title_category: OpenStack
 categories: OpenStack
 ---
-I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local LVM volumes, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:
+I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local [LVM volumes](http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux\)), which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:
 
 
 {% codeblock nova.conf on compute node lang:bash%}
@@ -33,3 +33,5 @@ __Update:__ If you're running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there's
 - out, err = execute('lvs', '--noheadings', '-o', 'lv_path', vg,
 + out, err = execute('lvs', '--noheadings', '-o', 'lv_name', vg,
 {% endcodeblock %}
+
+<a id="update2"></a>__Update #2:__ There's a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there's a patch for folsom and grizzly - [details here](http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/)
