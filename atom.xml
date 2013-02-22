@@ -4,7 +4,7 @@
   <title><![CDATA[Anthony Goddard]]></title>
   <link href="http://ops.anthonygoddard.com/atom.xml" rel="self"/>
   <link href="http://ops.anthonygoddard.com/"/>
-  <updated>2013-02-19T23:09:58-05:00</updated>
+  <updated>2013-02-21T22:09:25-05:00</updated>
   <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -20,7 +20,13 @@
     <id>http://ops.anthonygoddard.com/saving-the-world-with-devops</id>
     <content type="html"><![CDATA[<p>I had a great time this morning as a guest of the <a href="http://foodfightshow.org">Food Fight podcast</a> with <a href="https://twitter.com/bryanwb">Bryan Berry</a>, <a href="https://twitter.com/nathenharvey">Nathen Harvey</a>, <a href="https://twitter.com/solarce">Brandon Burton</a> and the always awesome <a href="https://twitter.com/jamesdotcuff">James Cuff</a>.</p>
 
-<p>We started a discussion about the role of DevOps in research computing and solving &#8216;the big problems&#8217; of the world and I had a chance to give a brief look into some of the work we&#8217;re doing on the <a href="http://eol.org">Encyclopedia of Life</a> project. I hope the conversation continues, hopefully we&#8217;ll get an opportunity to record a sequel.</p>
+<p>We started a discussion about the role of DevOps in research computing and solving &#8216;the big problems&#8217; of the world and I had a chance to give a brief look into some of the work we&#8217;re doing on the <a href="http://eol.org">Encyclopedia of Life</a> project. Hats off to Bryan and Nathen for bringing up the topic and dedicating a show to it, I think it was really great to get a feel for what issues are important to this community, even from such a small conversation. Climate change and cancer research were the two that immediately rose to the surface. Of course, within both are a myriad of research fields - genomics, microbiology, pharmacology, regenerative biology, cellular physiology, ecosystems, oceanography, biodiversity, meteorology, glaciology, that&#8217;s just a start. There are some really awesome intersections between devops and science, far more than there were with traditional dev and ops teams in my opinion. The ability to automate works well with scientists who generally need tools and compute capacity as fast as they can get it, with the lowest barrier to entry. While James spoke of his time setting up and running the <a href="http://rc.fas.harvard.edu">Research Computing</a> group at Harvard, he was also able to speak about his new gig at <a href="http://cyclecomputing.com">Cycle Computing</a>, where they&#8217;ve really blown the traditional HPC world apart by leveraging massive automation and cloud infrastructure for HPC.</p>
+
+<p>Brandon&#8217;s question about how our community can get involved stirred up some thoughts I&#8217;ve had over the past few months about exactly that, so I&#8217;ve decided to finally get something in the works and I&#8217;ll try to post about it soon.</p>
+
+<p>It was my first time on the Food Fight show and it was a ton of fun, I hope the conversation continues and hopefully we&#8217;ll get an opportunity to record a sequel.</p>
+
+<p>Here&#8217;s the show -</p>
 
 <div class="embed-video-container"><iframe src="http://www.youtube.com/embed/pJ4ahwABPRs "></iframe></div>
 
