@@ -4,7 +4,7 @@
   <title><![CDATA[Anthony Goddard]]></title>
   <link href="http://ops.anthonygoddard.com/atom.xml" rel="self"/>
   <link href="http://ops.anthonygoddard.com/"/>
-  <updated>2013-04-14T20:52:24-04:00</updated>
+  <updated>2013-08-15T15:48:26+10:00</updated>
   <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -14,19 +14,189 @@
 
   
   <entry>
+    <title type="html"><![CDATA[PaaS in under 10 minutes]]></title>
+    <link href="http://ops.anthonygoddard.com/paas-in-under-10-minutes"/>
+    <updated>2013-06-16T22:58:00+10:00</updated>
+    <id>http://ops.anthonygoddard.com/paas-in-under-10-minutes</id>
+    <content type="html"><![CDATA[<p>PaaS in under 10 minutes (or, &ldquo;Let&rsquo;s see if building a PaaS and deploying an app is faster than formatting a disk&rdquo;).</p>
+
+<p>We recently had some 4TB (RAID-0) external drives shipped to us to fill with BHL(biodiversitylibrary.org) content, we needed to format them as ext4 and then fill them up with books. Formatting the disks took a while, so I decided that for the next disk, I would see if I could setup a PaaS using Dokku, a cool little set of bash scripts that do some proxy, building &amp; assorted magic on top of docker. And then deploy an app to it. Here&rsquo;s how it panned out.</p>
+
+<h1>start the ext4 format:</h1>
+
+<pre><code>[16:10:41] [root@clustr-03 /root]# date;mkfs.ext4 /dev/sdz1
+Thu Jun 13 16:12:35 EDT 2013
+
+Writing inode tables:  1/29809
+</code></pre>
+
+<h1>prep the server with dokku</h1>
+
+<pre><code>$ wget -qO- https://raw.github.com/progrium/dokku/master/bootstrap.sh | sudo bash
+</code></pre>
+
+<p>We&rsquo;ll let that bake for a little while</p>
+
+<h1>setup app</h1>
+
+<pre><code>~/dev $ date;mkdir awyeah
+Thu Jun 13 16:12:55 EDT 2013
+~/dev $ cd awyeah/
+~/dev/awyeah $ bundle init
+~/dev/awyeah $ touch web.rb
+~/dev/awyeah $ touch config.ru
+~/dev/awyeah $ vim Gemfile
+</code></pre>
+
+<figure class='code'><figcaption><span>web.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>    <span class="n">source</span> <span class="s2">&quot;https://rubygems.org&quot;</span>
+</span><span class='line'>    <span class="n">ruby</span> <span class="s2">&quot;1.9.3&quot;</span>
+</span><span class='line'>    <span class="n">gem</span> <span class="s1">&#39;sinatra&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code>~/dev/awyeah $ vim web.rb
+</code></pre>
+
+<figure class='code'><figcaption><span>web.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;sinatra&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="s2">&quot;awwwwyeah!!!&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>time check</h1>
+
+<pre><code>~/dev/awyeah $ date;vim config.ru
+Thu Jun 13 16:14:05 EDT 2013
+</code></pre>
+
+<figure class='code'><figcaption><span>config.ru</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./web.rb&#39;</span>
+</span><span class='line'><span class="n">run</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Application</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code>~/dev/awyeah $ git init .
+Initialized empty Git repository in /Users/agoddard/dev/awyeah/.git/
+~/dev/awyeah (master) $ git add .
+~/dev/awyeah (master) $ git ci -am "awwyeah initial commit"
+[master (root-commit) ade6ea2] awwyeah initial commit
+ 3 files changed, 10 insertions(+)
+ create mode 100644 Gemfile
+ create mode 100644 config.ru
+ create mode 100644 web.rb
+~/dev/awyeah (master) $ git remote add deploy git@deploy.eol.org:awwyeah
+~/dev/awyeah (master) $ bundle
+Fetching gem metadata from https://rubygems.org/...........
+Fetching gem metadata from https://rubygems.org/..
+Resolving dependencies...
+Installing rack (1.5.2)
+Installing rack-protection (1.5.0)
+Installing tilt (1.4.1)
+Installing sinatra (1.4.3)
+Using bundler (1.3.5)
+Your bundle is complete!
+Use `bundle show [gemname]` to see where a bundled gem is installed.
+~/dev/awyeah (master) $ git ci -am "added Gemfile.lock"
+[master 787cdaa] added Gemfile.lock
+ 1 file changed, 17 insertions(+)
+ create mode 100644 Gemfile.lock
+</code></pre>
+
+<h1>back to server</h1>
+
+<pre><code>[...]
+nginx-reloader start/running, process 26946
+Be sure to upload a public key for your user:
+ cat ~/.ssh/id_rsa.pub | ssh root@deploy.eol.org "gitreceive upload-key ag"
+</code></pre>
+
+<p>looks good, let&rsquo;s finish it off</p>
+
+<pre><code>cat ~/.ssh/id_rsa.pub | ssh root@deploy.eol.org "gitreceive upload-key ag"
+</code></pre>
+
+<h1>ship it!</h1>
+
+<pre><code>~/dev/awyeah (master) $ git push deploy master
+Counting objects: 4, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 500 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote: -----&gt; Building awwyeah ...
+remote:        Ruby/Rack app detected
+remote: -----&gt; Using Ruby version: ruby-1.9.3
+remote: -----&gt; Installing dependencies using Bundler version 1.3.2
+remote:        Running: bundle install --without development:test --path vendor/bundle --binstubs vendor/bundle/bin --deployment
+remote:        Fetching gem metadata from https://rubygems.org/..........
+remote:        Fetching gem metadata from https://rubygems.org/..
+remote:        Installing rack (1.5.2)
+remote:        Installing rack-protection (1.5.0)
+remote:        Installing tilt (1.4.1)
+remote:        Installing sinatra (1.4.3)
+remote:        Using bundler (1.3.2)
+remote:        Your bundle is complete! It was installed into ./vendor/bundle
+remote:        Cleaning up the bundler cache.
+remote: -----&gt; Discovering process types
+remote:        Default process types for Ruby/Rack -&gt; rake, console, web
+remote: -----&gt; Build complete!
+remote: -----&gt; Deploying awwyeah ...
+remote: -----&gt; Application deployed:
+remote:        http://awwyeah.deploy.eol.org
+remote:
+To git@deploy.eol.org:awwyeah
+   ade6ea2..787cdaa  master -&gt; master
+</code></pre>
+
+<h1>and let&rsquo;s see if the site is online</h1>
+
+<pre><code>~/dev/awyeah (master) $ curl http://awyeah.deploy.eol.org
+oh hell yeah
+</code></pre>
+
+<h3>time?</h3>
+
+<pre><code>~/dev/awyeah (master) $ date
+Thu Jun 13 16:18:59 EDT 2013
+</code></pre>
+
+<h1>let&rsquo;s check on that formatting:</h1>
+
+<pre><code>Writing inode tables:  4289/29809
+</code></pre>
+
+<p>plenty of time (also, ext4/4TB is kinda slow&hellip;)</p>
+]]></content>
+  </entry>
+  
+  <entry>
     <title type="html"><![CDATA[Saving the World with DevOps]]></title>
     <link href="http://ops.anthonygoddard.com/saving-the-world-with-devops"/>
-    <updated>2013-02-19T22:56:00-05:00</updated>
+    <updated>2013-02-19T22:56:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/saving-the-world-with-devops</id>
     <content type="html"><![CDATA[<p>I had a great time this morning as a guest of the <a href="http://foodfightshow.org">Food Fight podcast</a> with <a href="https://twitter.com/bryanwb">Bryan Berry</a>, <a href="https://twitter.com/nathenharvey">Nathen Harvey</a>, <a href="https://twitter.com/solarce">Brandon Burton</a> and the always awesome <a href="https://twitter.com/jamesdotcuff">James Cuff</a>.</p>
 
-<p>We started a discussion about the role of DevOps in research computing and solving &#8216;the big problems&#8217; of the world and I had a chance to give a brief look into some of the work we&#8217;re doing on the <a href="http://eol.org">Encyclopedia of Life</a> project. Hats off to Bryan and Nathen for bringing up the topic and dedicating a show to it, I think it was really great to get a feel for what issues are important to this community, even from such a small conversation. Climate change and cancer research were the two that immediately rose to the surface. Of course, within both are a myriad of research fields - genomics, microbiology, pharmacology, regenerative biology, cellular physiology, ecosystems, oceanography, biodiversity, meteorology, glaciology, that&#8217;s just a start. There are some really awesome intersections between devops and science, far more than there were with traditional dev and ops teams in my opinion. The ability to automate works well with scientists who generally need tools and compute capacity as fast as they can get it, with the lowest barrier to entry. While James spoke of his time setting up and running the <a href="http://rc.fas.harvard.edu">Research Computing</a> group at Harvard, he was also able to speak about his new gig at <a href="http://cyclecomputing.com">Cycle Computing</a>, where they&#8217;ve really blown the traditional HPC world apart by leveraging massive automation and cloud infrastructure for HPC.</p>
+<p>We started a discussion about the role of DevOps in research computing and solving &lsquo;the big problems&rsquo; of the world and I had a chance to give a brief look into some of the work we&rsquo;re doing on the <a href="http://eol.org">Encyclopedia of Life</a> project. Hats off to Bryan and Nathen for bringing up the topic and dedicating a show to it, I think it was really great to get a feel for what issues are important to this community, even from such a small conversation. Climate change and cancer research were the two that immediately rose to the surface. Of course, within both are a myriad of research fields &ndash; genomics, microbiology, pharmacology, regenerative biology, cellular physiology, ecosystems, oceanography, biodiversity, meteorology, glaciology, that&rsquo;s just a start. There are some really awesome intersections between devops and science, far more than there were with traditional dev and ops teams in my opinion. The ability to automate works well with scientists who generally need tools and compute capacity as fast as they can get it, with the lowest barrier to entry. While James spoke of his time setting up and running the <a href="http://rc.fas.harvard.edu">Research Computing</a> group at Harvard, he was also able to speak about his new gig at <a href="http://cyclecomputing.com">Cycle Computing</a>, where they&rsquo;ve really blown the traditional HPC world apart by leveraging massive automation and cloud infrastructure for HPC.</p>
 
-<p>Brandon&#8217;s question about how our community can get involved stirred up some thoughts I&#8217;ve had over the past few months about exactly that, so I&#8217;ve decided to finally get something in the works and I&#8217;ll try to post about it soon.</p>
+<p>Brandon&rsquo;s question about how our community can get involved stirred up some thoughts I&rsquo;ve had over the past few months about exactly that, so I&rsquo;ve decided to finally get something in the works and I&rsquo;ll try to post about it soon.</p>
 
-<p>It was my first time on the Food Fight show and it was a ton of fun, I hope the conversation continues and hopefully we&#8217;ll get an opportunity to record a sequel.</p>
+<p>It was my first time on the Food Fight show and it was a ton of fun, I hope the conversation continues and hopefully we&rsquo;ll get an opportunity to record a sequel.</p>
 
-<p>Here&#8217;s the show -</p>
+<p>Here&rsquo;s the show &ndash;</p>
 
 <div class="embed-video-container"><iframe src="http://www.youtube.com/embed/pJ4ahwABPRs "></iframe></div>
 
@@ -36,9 +206,9 @@
   <entry>
     <title type="html"><![CDATA[Demystifying OpenStack Folsom quotas]]></title>
     <link href="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas"/>
-    <updated>2013-01-22T00:04:00-05:00</updated>
+    <updated>2013-01-22T00:04:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas</id>
-    <content type="html"><![CDATA[<p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&#8217;re not careful, both in Nova and in Cinder.</p>
+    <content type="html"><![CDATA[<p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&rsquo;re not careful, both in Nova and in Cinder.</p>
 
 <h1>Nova Quotas</h1>
 
@@ -68,7 +238,7 @@ agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------------------------+--------+
 </code></pre>
 
-<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won&#8217;t actually reference the tenant (or any tenant for that matter):</p>
+<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won&rsquo;t actually reference the tenant (or any tenant for that matter):</p>
 
 <pre><code>agoddard@control1:~# nova quota-show ops
 +-----------------------------+-------+
@@ -88,7 +258,7 @@ agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 
 <p>As you can see, floating IPs, ram and volumes are all different when using the name rather than UUID.</p>
 
-<p>It get&#8217;s a little stranger - what if we just make up a tenant:</p>
+<p>It get&rsquo;s a little stranger &ndash; what if we just make up a tenant:</p>
 
 <pre><code>agoddard@control1:~# nova quota-show nonexistent-tenant
 +-----------------------------+-------+
@@ -121,15 +291,15 @@ agoddard@control1:~# nova quota-show nonexistent-tenant
 +-----------------------------+-------+
 </code></pre>
 
-<p>Nova created an entry for the tenant, even though the tenant doesn&#8217;t exist. This is what makes it appear that a change has been made when it hasn&#8217;t, and without an error being thrown, things can get pretty confusing.</p>
+<p>Nova created an entry for the tenant, even though the tenant doesn&rsquo;t exist. This is what makes it appear that a change has been made when it hasn&rsquo;t, and without an error being thrown, things can get pretty confusing.</p>
 
 <p><strong>Long story short, always use the UUID of a tenant when setting quotas.</strong></p>
 
 <h1>Cinder Quotas</h1>
 
-<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID&#8217;s wouldn&#8217;t work for me.</p>
+<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID&rsquo;s wouldn&rsquo;t work for me.</p>
 
-<p>First, we can check the tenant&#8217;s quota, which is 50TB:</p>
+<p>First, we can check the tenant&rsquo;s quota, which is 50TB:</p>
 
 <pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------------------------+--------+
@@ -171,7 +341,7 @@ agoddard@control1:~# nova quota-show nonexistent-tenant
 </code></pre>
 
 <p>It appears like everything is fine, however when I try to add additional volume space about 50TB, I get an API error about exceeding my quota, and Horizon shows the quota as 50TB.
-By checking the quota with the <code>cinder</code> command, we can see that the quota update didn&#8217;t actually have any effect at all:</p>
+By checking the quota with the <code>cinder</code> command, we can see that the quota update didn&rsquo;t actually have any effect at all:</p>
 
 <pre><code>agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------+-------+
@@ -203,11 +373,11 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
   <entry>
     <title type="html"><![CDATA[OpenStack Local LVM instance storage]]></title>
     <link href="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage"/>
-    <updated>2012-11-17T22:28:00-05:00</updated>
+    <updated>2012-11-17T22:28:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage</id>
-    <content type="html"><![CDATA[<p>I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&#8217;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&#8217;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I&#8217;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&rsquo;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&rsquo;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I&rsquo;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
 
-<figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
+<figure class='code'><figcaption><span>nova.conf on compute node</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">libvirt_images_type</span><span class="o">=</span>lvm
@@ -215,7 +385,7 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &#8220;nova_local&#8221; which can be done as follows.</p>
+<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &ldquo;nova_local&rdquo; which can be done as follows.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -226,11 +396,11 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Running <code>vgs</code> should now show a &#8220;nova_local&#8221; volume group.</p>
+<p>Running <code>vgs</code> should now show a &ldquo;nova_local&rdquo; volume group.</p>
 
-<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&#8217;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
+<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&rsquo;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
 
-<p><strong>Update:</strong> If you&#8217;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&#8217;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
+<p><strong>Update:</strong> If you&rsquo;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&rsquo;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
 
 <figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -239,14 +409,14 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a id="update2"></a><strong>Update #2:</strong> There&#8217;s a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there&#8217;s a patch for folsom and grizzly - <a href="http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/">details here</a></p>
+<p><a id="update2"></a><strong>Update #2:</strong> There&rsquo;s a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there&rsquo;s a patch for folsom and grizzly &ndash; <a href="http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/">details here</a></p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Vagrant]]></title>
     <link href="http://ops.anthonygoddard.com/Vagrant/vagrant"/>
-    <updated>2011-08-15T17:54:00-04:00</updated>
+    <updated>2011-08-15T17:54:00+10:00</updated>
     <id>http://ops.anthonygoddard.com/Vagrant/vagrant</id>
     <content type="html"><![CDATA[<h4>User Story:</h4>
 
@@ -261,16 +431,16 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 </ul>
 
 
-<p>As a sysadmin, I&#8217;m a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it&#8217;s nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout.
-Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it&#8217;s nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™.</p>
+<p>As a sysadmin, I&rsquo;m a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it&rsquo;s nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout.
+Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it&rsquo;s nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™.</p>
 
 <h3>Enter Vagrant</h3>
 
 <p><a href="http://vagrantup.com">Vagrant</a> is a ruby gem which performs automated building and provisioning of VirtualBox machines. Vagrant takes care of all the behind the scenes work with VirtualBox, so while you need VirtualBox installed, you technically never even need to launch the app.</p>
 
-<p><em>So what? Double clicking an app doesn&#8217;t take much time, and I get to use a nice GUI.</em></p>
+<p><em>So what? Double clicking an app doesn&rsquo;t take much time, and I get to use a nice GUI.</em></p>
 
-<p>A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here&#8217;s a simple example of getting up and running (I&#8217;ve trimmed a bit of the verbosity from the responses, but this is honestly it:</p>
+<p>A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here&rsquo;s a simple example of getting up and running (I&rsquo;ve trimmed a bit of the verbosity from the responses, but this is honestly it:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -303,7 +473,7 @@ Using vm-builder makes provisioning simple guests fast, efficient and flexible w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>So what&#8217;s actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn&#8217;t get much simpler than this:</p>
+<p>So what&rsquo;s actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn&rsquo;t get much simpler than this:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -316,7 +486,7 @@ Using vm-builder makes provisioning simple guests fast, efficient and flexible w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Of course, simple doesn&#8217;t mean it&#8217;s lacking in ability - there&#8217;s a <a href="http://vagrantup.com/v1/docs/vagrantfile.html">whole host of configuration options</a> you can specify from simple <a href="http://vagrantup.com/v1/docs/config/vm/customize.html">ram</a> settings to <a href="http://vagrantup.com/v1/docs/provisioners.html">auto provisioning</a> with <a href="http://vagrantup.com/v1/docs/provisioners/chef_solo.html">chef</a>, <a href="http://vagrantup.com/v1/docs/provisioners/puppet.html">puppet</a> or even simple <a href="http://vagrantup.com/v1/docs/provisioners/shell.html">bash scripts</a>. Here&#8217;s an example with a few more options thrown in:</p>
+<p>Of course, simple doesn&rsquo;t mean it&rsquo;s lacking in ability &ndash; there&rsquo;s a <a href="http://vagrantup.com/v1/docs/vagrantfile.html">whole host of configuration options</a> you can specify from simple <a href="http://vagrantup.com/v1/docs/config/vm/customize.html">ram</a> settings to <a href="http://vagrantup.com/v1/docs/provisioners.html">auto provisioning</a> with <a href="http://vagrantup.com/v1/docs/provisioners/chef_solo.html">chef</a>, <a href="http://vagrantup.com/v1/docs/provisioners/puppet.html">puppet</a> or even simple <a href="http://vagrantup.com/v1/docs/provisioners/shell.html">bash scripts</a>. Here&rsquo;s an example with a few more options thrown in:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -335,14 +505,14 @@ Using vm-builder makes provisioning simple guests fast, efficient and flexible w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>What about when you&#8217;re done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I&#8217;ll suggest you check out the [docs] and see for yourself.</p>
+<p>What about when you&rsquo;re done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I&rsquo;ll suggest you check out the [docs] and see for yourself.</p>
 
-<p><em>What about security? Who made this &#8220;box&#8221; file?</em></p>
+<p><em>What about security? Who made this &ldquo;box&rdquo; file?</em></p>
 
 <p>I hear you, but fear not. For those who want to build their own boxes, not only is this possible, but with a tool called <a href="https://github.com/jedi4ever/veewee">veewee</a>, <a href="http://twitter.com/patrickdebois">@patrickdebois</a> has made is insanely easy.
-I&#8217;ll cover that in a followup post, but rest assured, this is Not a Problem™.</p>
+I&rsquo;ll cover that in a followup post, but rest assured, this is Not a Problem™.</p>
 
-<p>But wait, there&#8217;s more&#8230;</p>
+<p>But wait, there&rsquo;s more&hellip;</p>
 
 <p>You can have more than one VM in a Vagrantfile and when assigned IPs, such as in the example above, these hosts can communicate over a private, host-only network. This paves the way for setting up whole stacks / clusters on a single host, bringing dev/test-like-prod nirvana just one step closer.</p>
 ]]></content>
@@ -351,13 +521,13 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
   <entry>
     <title type="html"><![CDATA[Some nice new features in Chef 0.10.0]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0"/>
-    <updated>2011-05-10T17:54:00-04:00</updated>
+    <updated>2011-05-10T17:54:00+10:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0</id>
-    <content type="html"><![CDATA[<p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I&#8217;d heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn&#8217;t realized how many cool features were due for release in 0.10.0 and I thought I&#8217;d mention a few of my favorite and perhaps lesser known new features here.</p>
+    <content type="html"><![CDATA[<p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I&rsquo;d heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn&rsquo;t realized how many cool features were due for release in 0.10.0 and I thought I&rsquo;d mention a few of my favorite and perhaps lesser known new features here.</p>
 
 <h2>Knife Plugins</h2>
 
-<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don&#8217;t need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There&#8217;s a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
+<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don&rsquo;t need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There&rsquo;s a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
 
 <h2>Encrypted Data Bags</h2>
 
@@ -365,22 +535,22 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
 
 <h2>Chef Expander</h2>
 
-<p>This behind the scenes update will probably stay out of your way for the most part, but it&#8217;s cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it&#8217;s nice to know that this can scale horizontally as your infrastructure grows.</p>
+<p>This behind the scenes update will probably stay out of your way for the most part, but it&rsquo;s cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it&rsquo;s nice to know that this can scale horizontally as your infrastructure grows.</p>
 
 <h2>Cookbook Versioning</h2>
 
-<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I&#8217;d like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I&#8217;m very excited to see how this evolves as Chef moves beyond 0.10</p>
+<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I&rsquo;d like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I&rsquo;m very excited to see how this evolves as Chef moves beyond 0.10</p>
 
 <h2>Upgrading</h2>
 
-<p>If the above features aren&#8217;t a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
+<p>If the above features aren&rsquo;t a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Cookbooks as gems.]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems"/>
-    <updated>2011-05-04T17:54:00-04:00</updated>
+    <updated>2011-05-04T17:54:00+10:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/cookbooks-as-gems</id>
     <content type="html"><![CDATA[<p><strong>Update:</strong> Many of the questions below have been resolved in the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">0.10.0 release of Chef</a> and Opscode have also provided a <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">great overview</a> of the current state of the community cookbooks repository.</p>
 
@@ -390,17 +560,17 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
 <li>As a sysadmin
 
 <ul>
-<li>I&#8217;d like to version cookbooks and download custom cookbooks</li>
+<li>I&rsquo;d like to version cookbooks and download custom cookbooks</li>
 <li>  so that I can better manage cookbook dependencies.</li>
 </ul>
 </li>
 </ul>
 
 
-<p>I&#8217;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&#8217;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &#8216;vendor&#8217; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&#8217;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
-*   &#8220;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &#8221;
-*   &#8220;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&#8217;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&#8221;
-*   &#8220;I&#8217;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&#8221; Rather than get into too much detail about those specific cases, I thought I&#8217;d provide an example of what a rubygems-esque cookbook management process might look like</p>
+<p>I&rsquo;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&rsquo;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &lsquo;vendor&rsquo; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&rsquo;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
+*   &ldquo;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &rdquo;
+*   &ldquo;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&rsquo;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&rdquo;
+*   &ldquo;I&rsquo;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&rdquo; Rather than get into too much detail about those specific cases, I thought I&rsquo;d provide an example of what a rubygems-esque cookbook management process might look like</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -415,7 +585,7 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>&#8230;and how these might look in a recipe&#8230;</p>
+<p>&hellip;and how these might look in a recipe&hellip;</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -432,14 +602,14 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I&#8217;m sure there&#8217;s things I&#8217;m missing here, but I&#8217;d love to see where this concept leads.. cookbooks already support versioning but I&#8217;m not sure if there&#8217;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&#8217;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&#8217;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&#8217;t ideal, but it&#8217;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&#8217;m sure there are many other approaches to this same issue and I&#8217;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&#8217;m looking at the beginnings of something big, like github or rubygems and I&#8217;m excited to see where it goes.</p>
+<p>I&rsquo;m sure there&rsquo;s things I&rsquo;m missing here, but I&rsquo;d love to see where this concept leads.. cookbooks already support versioning but I&rsquo;m not sure if there&rsquo;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&rsquo;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&rsquo;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&rsquo;t ideal, but it&rsquo;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&rsquo;m sure there are many other approaches to this same issue and I&rsquo;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&rsquo;m looking at the beginnings of something big, like github or rubygems and I&rsquo;m excited to see where it goes.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Updating rubygems for chef-client on debian lenny]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny"/>
-    <updated>2011-01-21T17:54:00-05:00</updated>
+    <updated>2011-01-21T17:54:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny</id>
     <content type="html"><![CDATA[<p>User Story:</p>
 
@@ -526,7 +696,7 @@ so that chef-client and other tools that rely on rubygems will work.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>A quick post to the opscode discussion forum (actually the wrong forum but jtimberman was kind enough to help out) told us that the error was the result of the outdated rubygems package. The easy solution was to simply use rubygem&#8217;s own self-updating mechanism by running <code>gem update --system</code>. Easy enough, however the version installed by apt doesn&#8217;t actually permit this:</p>
+<p>A quick post to the opscode discussion forum (actually the wrong forum but jtimberman was kind enough to help out) told us that the error was the result of the outdated rubygems package. The easy solution was to simply use rubygem&rsquo;s own self-updating mechanism by running <code>gem update --system</code>. Easy enough, however the version installed by apt doesn&rsquo;t actually permit this:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -535,7 +705,7 @@ so that chef-client and other tools that rely on rubygems will work.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>At this point we could have introduced new apt sources to see if they contained more recent versions, but we decided we really wanted rubygems to be able to update itself. Rather than reinstall rubygems from source, we found that there was a rubygem on rubygems.org for exactly this purpose &#8220;rubygems-update&#8221;. Unfortunately for some reason, perhaps an incompatibility between rubygems 1.2.0 and rubygems.org, even after adding rubygems.org as a gem source, gem complained it was unable to find the repository online. Downloading the gem and installing it locally provided the fix for that:</p>
+<p>At this point we could have introduced new apt sources to see if they contained more recent versions, but we decided we really wanted rubygems to be able to update itself. Rather than reinstall rubygems from source, we found that there was a rubygem on rubygems.org for exactly this purpose &ldquo;rubygems-update&rdquo;. Unfortunately for some reason, perhaps an incompatibility between rubygems 1.2.0 and rubygems.org, even after adding rubygems.org as a gem source, gem complained it was unable to find the repository online. Downloading the gem and installing it locally provided the fix for that:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -556,18 +726,18 @@ so that chef-client and other tools that rely on rubygems will work.</p>
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Problem solved. With the new version of rubygems installed, we&#8217;re now able to run gem update &#8211;system to stay up to date.</p>
+<p>Problem solved. With the new version of rubygems installed, we&rsquo;re now able to run gem update &mdash;system to stay up to date.</p>
 
-<p>I believe rubygems was originally installed as a dependency of the chef package in the opscode apt repo, and the rubygems version in there is 1.2.0. So it appears that this problem would always occur when bootstrapping a new debian lenny machine with chef-client using only the apt packages, so I&#8217;ll be switching to bootstrapping via the chef gems rather than using apt. I&#8217;ll pose this question to the smart folks at opscode though and see if there isn&#8217;t a simple answer to the package dependency issue.</p>
+<p>I believe rubygems was originally installed as a dependency of the chef package in the opscode apt repo, and the rubygems version in there is 1.2.0. So it appears that this problem would always occur when bootstrapping a new debian lenny machine with chef-client using only the apt packages, so I&rsquo;ll be switching to bootstrapping via the chef gems rather than using apt. I&rsquo;ll pose this question to the smart folks at opscode though and see if there isn&rsquo;t a simple answer to the package dependency issue.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Basic XenServer CLI use]]></title>
     <link href="http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use"/>
-    <updated>2010-12-10T17:54:00-05:00</updated>
+    <updated>2010-12-10T17:54:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use</id>
-    <content type="html"><![CDATA[<p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer&#8217;s &#8216;xsconsole&#8217; tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
+    <content type="html"><![CDATA[<p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer&rsquo;s &lsquo;xsconsole&rsquo; tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
 
 <p>User Story:</p>
 
@@ -575,9 +745,9 @@ so that chef-client and other tools that rely on rubygems will work.</p>
 I need to start a XenServer guest from the command line
 so that I can start guests without having to use a GUI.</p>
 
-<p>When using Resource Pools, there is no way within the console to boot machines which are powered off - attempting to view all machines results in the error message: &#8220;This feature is unavailable in Pools with more than 100 Virtual Machines&#8221;, even if you have less than 100 virtual machines.</p>
+<p>When using Resource Pools, there is no way within the console to boot machines which are powered off &ndash; attempting to view all machines results in the error message: &ldquo;This feature is unavailable in Pools with more than 100 Virtual Machines&rdquo;, even if you have less than 100 virtual machines.</p>
 
-<p>Here&#8217;s where the XenServer command line applications come in handy. In order to boot a machine which is powered off, you can ssh to any machine in the pool and run <code>xe vm-list</code></p>
+<p>Here&rsquo;s where the XenServer command line applications come in handy. In order to boot a machine which is powered off, you can ssh to any machine in the pool and run <code>xe vm-list</code></p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -593,7 +763,7 @@ so that I can start guests without having to use a GUI.</p>
 
 
 <p>This will show you all of your machines by name, state and uuid. Once you find the machine you want to boot, simply run <code>xe vm-start</code> and pass it the uuid you want to boot:
-[code lang=&#8217;bash&#8217;]
+[code lang=&lsquo;bash&rsquo;]
 [root@ubio-vmh07 ~]# xe vm-start uuid=0ebb9d7d-1743-f9a0-f5b8-692930cc3ad0
 [/code]</p>
 
@@ -613,7 +783,7 @@ so that I can start guests without having to use a GUI.</p>
   <entry>
     <title type="html"><![CDATA[Querying Chef using the REST API]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api"/>
-    <updated>2010-12-09T17:54:00-05:00</updated>
+    <updated>2010-12-09T17:54:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api</id>
     <content type="html"><![CDATA[<p>Assumptions: You have a working knife configuration.</p>
 
@@ -626,9 +796,9 @@ so that I can start guests without having to use a GUI.</p>
 </ul>
 
 
-<p>In order to access the Chef Server programmatically I first had to figure out authentication. Unfortunately, I couldn&#8217;t find any good examples of how to actually do this. The Chef Server API wiki page has some basic requirements and concepts, but no concrete examples.</p>
+<p>In order to access the Chef Server programmatically I first had to figure out authentication. Unfortunately, I couldn&rsquo;t find any good examples of how to actually do this. The Chef Server API wiki page has some basic requirements and concepts, but no concrete examples.</p>
 
-<p>However, it gave me a good starting place&#8211;the Chef::REST library. The REST library that comes bundled with Chef in every version > 0.9.0. Let&#8217;s just make sure that we actually have that version:</p>
+<p>However, it gave me a good starting place&mdash;the Chef::REST library. The REST library that comes bundled with Chef in every version > 0.9.0. Let&rsquo;s just make sure that we actually have that version:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>

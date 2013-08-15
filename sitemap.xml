@@ -2,54 +2,58 @@
 <urlset xmlns='http://www.sitemaps.org/schemas/sitemap/0.9'>
     <url>
         <loc>http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>
             http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny
         </loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/Chef/cookbooks-as-gems</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>
             http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0
         </loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/Vagrant/vagrant</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/saving-the-world-with-devops</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
+    </url>
+    <url>
+        <loc>http://ops.anthonygoddard.com/paas-in-under-10-minutes</loc>
+        <lastmod>2013-08-12T17:44:41+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/404.html</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-06-17T13:22:33+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/blog/archives/</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-08-12T17:44:41+10:00</lastmod>
     </url>
     <url>
         <loc>http://ops.anthonygoddard.com/</loc>
-        <lastmod>2013-04-14T20:52:14-04:00</lastmod>
+        <lastmod>2013-08-12T17:44:41+10:00</lastmod>
     </url>
 </urlset>

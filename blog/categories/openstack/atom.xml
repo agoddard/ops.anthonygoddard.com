@@ -4,7 +4,7 @@
   <title><![CDATA[Category: OpenStack | Anthony Goddard]]></title>
   <link href="http://ops.anthonygoddard.com/blog/categories/openstack/atom.xml" rel="self"/>
   <link href="http://ops.anthonygoddard.com/"/>
-  <updated>2013-04-14T20:52:24-04:00</updated>
+  <updated>2013-08-15T15:48:26+10:00</updated>
   <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -16,9 +16,9 @@
   <entry>
     <title type="html"><![CDATA[Demystifying OpenStack Folsom quotas]]></title>
     <link href="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas"/>
-    <updated>2013-01-22T00:04:00-05:00</updated>
+    <updated>2013-01-22T00:04:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas</id>
-    <content type="html"><![CDATA[<p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you're not careful, both in Nova and in Cinder.</p>
+    <content type="html"><![CDATA[<p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&rsquo;re not careful, both in Nova and in Cinder.</p>
 
 <h1>Nova Quotas</h1>
 
@@ -48,7 +48,7 @@ agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------------------------+--------+
 </code></pre>
 
-<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won't actually reference the tenant (or any tenant for that matter):</p>
+<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won&rsquo;t actually reference the tenant (or any tenant for that matter):</p>
 
 <pre><code>agoddard@control1:~# nova quota-show ops
 +-----------------------------+-------+
@@ -68,7 +68,7 @@ agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 
 <p>As you can see, floating IPs, ram and volumes are all different when using the name rather than UUID.</p>
 
-<p>It get's a little stranger - what if we just make up a tenant:</p>
+<p>It get&rsquo;s a little stranger &ndash; what if we just make up a tenant:</p>
 
 <pre><code>agoddard@control1:~# nova quota-show nonexistent-tenant
 +-----------------------------+-------+
@@ -101,15 +101,15 @@ agoddard@control1:~# nova quota-show nonexistent-tenant
 +-----------------------------+-------+
 </code></pre>
 
-<p>Nova created an entry for the tenant, even though the tenant doesn't exist. This is what makes it appear that a change has been made when it hasn't, and without an error being thrown, things can get pretty confusing.</p>
+<p>Nova created an entry for the tenant, even though the tenant doesn&rsquo;t exist. This is what makes it appear that a change has been made when it hasn&rsquo;t, and without an error being thrown, things can get pretty confusing.</p>
 
 <p><strong>Long story short, always use the UUID of a tenant when setting quotas.</strong></p>
 
 <h1>Cinder Quotas</h1>
 
-<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID's wouldn't work for me.</p>
+<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID&rsquo;s wouldn&rsquo;t work for me.</p>
 
-<p>First, we can check the tenant's quota, which is 50TB:</p>
+<p>First, we can check the tenant&rsquo;s quota, which is 50TB:</p>
 
 <pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------------------------+--------+
@@ -151,7 +151,7 @@ agoddard@control1:~# nova quota-show nonexistent-tenant
 </code></pre>
 
 <p>It appears like everything is fine, however when I try to add additional volume space about 50TB, I get an API error about exceeding my quota, and Horizon shows the quota as 50TB.
-By checking the quota with the <code>cinder</code> command, we can see that the quota update didn't actually have any effect at all:</p>
+By checking the quota with the <code>cinder</code> command, we can see that the quota update didn&rsquo;t actually have any effect at all:</p>
 
 <pre><code>agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------+-------+
@@ -183,18 +183,18 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
   <entry>
     <title type="html"><![CDATA[OpenStack Local LVM instance storage]]></title>
     <link href="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage"/>
-    <updated>2012-11-17T22:28:00-05:00</updated>
+    <updated>2012-11-17T22:28:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage</id>
-    <content type="html"><![CDATA[<p>I've been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it's always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn't been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I've read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+    <content type="html"><![CDATA[<p>I&rsquo;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&rsquo;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&rsquo;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I&rsquo;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>nova.conf on compute node</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">libvirt_images_type</span><span class="o">=</span>lvm
 </span><span class='line'><span class="nv">libvirt_images_volume_group</span><span class="o">=</span>nova_local
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called "nova_local" which can be done as follows.</p>
+<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &ldquo;nova_local&rdquo; which can be done as follows.</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -204,25 +204,26 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 <span class='line-number'>6</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>&lt;/p&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;h1&gt;make sure /dev/sda1 is a free disk, formatted as <span class="s2">&quot;Linux LVM&quot;</span>&lt;/h1&gt;
+</span><span class='line'>&lt;h1&gt;make sure /dev/sda1 is a free disk, formatted as &amp;ldquo;Linux LVM&amp;rdquo;&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;pvcreate /dev/sda1 <span class="c">#create an LVM physical volume from the disk</span>
 </span><span class='line'>vgcreate nova_local /dev/sda1 <span class="c">#create the volume group</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p>Running <code>vgs</code> should now show a "nova_local" volume group.</p>
+<p>Running <code>vgs</code> should now show a &ldquo;nova_local&rdquo; volume group.</p>
 
-<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren't any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
+<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&rsquo;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
 
-<p><strong>Update:</strong> If you're running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there's a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
+<p><strong>Update:</strong> If you&rsquo;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&rsquo;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
 
-<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<p><div class='bogus-wrapper'><notextile><figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py <a href="https://answers.launchpad.net/nova/+question/211112">https://answers.launchpad.net/nova/+question/211112</a> </span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='diff'><span class='line'><span class="gd">- out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_path&#39;, vg,</span>
-</span><span class='line'><span class="gi">+ out, err = execute(&#39;lvs&#39;, &#39;--noheadings&#39;, &#39;-o&#39;, &#39;lv_name&#39;, vg,</span>
+</pre></td><td class='code'><pre><code class='diff'><span class='line'>&amp;ndash; out, err = execute(&amp;lsquo;lvs&amp;rsquo;, &amp;lsquo;&amp;mdash;noheadings&amp;rsquo;, &amp;lsquo;-o&amp;rsquo;, &amp;lsquo;lv_path&amp;rsquo;, vg,
+</span><span class='line'><span class="gi">+ out, err = execute(&amp;lsquo;lvs&amp;rsquo;, &amp;lsquo;&amp;mdash;noheadings&amp;rsquo;, &amp;lsquo;-o&amp;rsquo;, &amp;lsquo;lv_name&amp;rsquo;, vg,</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
-<p><a id="update2"></a><strong>Update #2:</strong> There's a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there's a patch for folsom and grizzly - <a href="http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/">details here</a></p>
+<p><a id="update2"></a><strong>Update #2:</strong> There&rsquo;s a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there&rsquo;s a patch for folsom and grizzly &ndash; <a href="http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/">details here</a></p>
 ]]></content>
   </entry>
   

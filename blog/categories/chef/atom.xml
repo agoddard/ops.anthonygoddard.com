@@ -4,7 +4,7 @@
   <title><![CDATA[Category: Chef | Anthony Goddard]]></title>
   <link href="http://ops.anthonygoddard.com/blog/categories/chef/atom.xml" rel="self"/>
   <link href="http://ops.anthonygoddard.com/"/>
-  <updated>2013-04-14T20:52:24-04:00</updated>
+  <updated>2013-08-15T15:48:26+10:00</updated>
   <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -16,13 +16,13 @@
   <entry>
     <title type="html"><![CDATA[Some nice new features in Chef 0.10.0]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0"/>
-    <updated>2011-05-10T17:54:00-04:00</updated>
+    <updated>2011-05-10T17:54:00+10:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0</id>
-    <content type="html"><![CDATA[<p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I'd heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn't realized how many cool features were due for release in 0.10.0 and I thought I'd mention a few of my favorite and perhaps lesser known new features here.</p>
+    <content type="html"><![CDATA[<p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I&rsquo;d heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn&rsquo;t realized how many cool features were due for release in 0.10.0 and I thought I&rsquo;d mention a few of my favorite and perhaps lesser known new features here.</p>
 
 <h2>Knife Plugins</h2>
 
-<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don't need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There's a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
+<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don&rsquo;t need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There&rsquo;s a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
 
 <h2>Encrypted Data Bags</h2>
 
@@ -30,22 +30,22 @@
 
 <h2>Chef Expander</h2>
 
-<p>This behind the scenes update will probably stay out of your way for the most part, but it's cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it's nice to know that this can scale horizontally as your infrastructure grows.</p>
+<p>This behind the scenes update will probably stay out of your way for the most part, but it&rsquo;s cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it&rsquo;s nice to know that this can scale horizontally as your infrastructure grows.</p>
 
 <h2>Cookbook Versioning</h2>
 
-<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I'd like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I'm very excited to see how this evolves as Chef moves beyond 0.10</p>
+<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I&rsquo;d like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I&rsquo;m very excited to see how this evolves as Chef moves beyond 0.10</p>
 
 <h2>Upgrading</h2>
 
-<p>If the above features aren't a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
+<p>If the above features aren&rsquo;t a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Cookbooks as gems.]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems"/>
-    <updated>2011-05-04T17:54:00-04:00</updated>
+    <updated>2011-05-04T17:54:00+10:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/cookbooks-as-gems</id>
     <content type="html"><![CDATA[<p><strong>Update:</strong> Many of the questions below have been resolved in the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">0.10.0 release of Chef</a> and Opscode have also provided a <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">great overview</a> of the current state of the community cookbooks repository.</p>
 
@@ -55,50 +55,50 @@
 <li>As a sysadmin
 
 <ul>
-<li>I'd like to version cookbooks and download custom cookbooks</li>
+<li>I&rsquo;d like to version cookbooks and download custom cookbooks</li>
 <li>  so that I can better manage cookbook dependencies.</li>
 </ul>
 </li>
 </ul>
 
 
-<p>I've been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I'm interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to 'vendor' the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don't (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
-*   "The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it "
-*   "My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I'd like to install her apache2 cookbook and use it alongside the default community apache2 cookbook"
-*   "I've seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?" Rather than get into too much detail about those specific cases, I thought I'd provide an example of what a rubygems-esque cookbook management process might look like
+<p>I&rsquo;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&rsquo;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &lsquo;vendor&rsquo; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&rsquo;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
+*   &ldquo;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &rdquo;
+*   &ldquo;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&rsquo;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&rdquo;
+*   &ldquo;I&rsquo;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&rdquo; Rather than get into too much detail about those specific cases, I thought I&rsquo;d provide an example of what a rubygems-esque cookbook management process might look like
 <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'>knife cookbook install apache2 <span class="c"># installs the apache2 cookbook along with dependencies</span>
-</span><span class='line'>knife cookbook install apache2 --version<span class="o">=</span>1.02 <span class="c"># installs a legacy version of the apache2 cookbook</span>
+</span><span class='line'>knife cookbook install apache2 &amp;mdash;version<span class="o">=</span>1.02 <span class="c"># installs a legacy version of the apache2 cookbook</span>
 </span><span class='line'>knife cookbook install agoddard-apache2 <span class="c"># installs my fork of the apache2 cookbook along with dependencies</span>
 </span><span class='line'>knife cookbook install agoddard-custom_weird_app <span class="c"># installs my cookbook and dependencies for an obscure app that only I use but which I want to manage the same way</span>
 </span><span class='line'>knife cookbook install custom_weird_app <span class="c"># the above cookbook when the obscure app becomes more mainstream</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-...and how these might look in a recipe...
+&hellip;and how these might look in a recipe&hellip;
 <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;apache2&quot;</span>
-</span><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;agoddard-apache2&quot;</span>
-</span><span class='line'><span class="n">include_recipe</span> <span class="s2">&quot;apache2&quot;</span><span class="p">,</span> <span class="s2">&quot;=1.02&quot;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="n">include_recipe</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">apache2</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">include_recipe</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">agoddard</span><span class="o">-</span><span class="n">apache2</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
+</span><span class='line'><span class="n">include_recipe</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="n">apache2</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;,</span> <span class="o">&amp;</span><span class="n">ldquo</span><span class="p">;</span><span class="o">=</span><span class="mi">1</span><span class="o">.</span><span class="mo">02</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;</span>
 </span><span class='line'><span class="sx">%w{ apache2 agoddard-apache2 apache2-1.02 }</span><span class="o">.</span><span class="n">each</span> <span class="k">do</span> <span class="o">|</span><span class="n">cb</span><span class="o">|</span>
 </span><span class='line'>  <span class="n">depends</span> <span class="n">cb</span>
 </span><span class='line'><span class="k">end</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-I'm sure there's things I'm missing here, but I'd love to see where this concept leads.. cookbooks already support versioning but I'm not sure if there's a simple way of maintaining two versions and having legacy cookbooks support the older one. It's obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it's hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn't ideal, but it's more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I'm sure there are many other approaches to this same issue and I'd love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I'm looking at the beginnings of something big, like github or rubygems and I'm excited to see where it goes.</p>
+I&rsquo;m sure there&rsquo;s things I&rsquo;m missing here, but I&rsquo;d love to see where this concept leads.. cookbooks already support versioning but I&rsquo;m not sure if there&rsquo;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&rsquo;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&rsquo;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&rsquo;t ideal, but it&rsquo;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&rsquo;m sure there are many other approaches to this same issue and I&rsquo;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&rsquo;m looking at the beginnings of something big, like github or rubygems and I&rsquo;m excited to see where it goes.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Updating rubygems for chef-client on debian lenny]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny"/>
-    <updated>2011-01-21T17:54:00-05:00</updated>
+    <updated>2011-01-21T17:54:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/updating-rubygems-for-chef-client-on-debian-lenny</id>
     <content type="html"><![CDATA[<p>User Story:</p>
 
@@ -152,12 +152,12 @@ so that chef-client and other tools that rely on rubygems will work.</p>
 </span><span class='line'>&lt;h1&gt;chef-client&lt;/h1&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;<span class="o">[</span>Thu, 20 Jan 2011 20:45:43 +0000<span class="o">]</span> INFO: Starting Chef Run <span class="o">(</span>Version 0.9.12<span class="o">)</span>
-</span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:43 +0000<span class="o">]</span> WARN: Missing gem <span class="s1">&#39;mysql&#39;</span>
+</span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:43 +0000<span class="o">]</span> WARN: Missing gem &amp;lsquo;mysql&amp;rsquo;
 </span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:44 +0000<span class="o">]</span> ERROR: Running exception handlers
 </span><span class='line'><span class="o">[</span>Thu, 20 Jan 2011 20:45:44 +0000<span class="o">]</span> ERROR: Exception handlers <span class="nb">complete</span>
-</span><span class='line'>/usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:89:in &lt;code&gt;with_gem_sources<span class="s1">&#39;: undefined method&lt;/code&gt;sources=&#39;</span> <span class="k">for </span>Gem:Module <span class="o">(</span>NoMethodError<span class="o">)</span>
-</span><span class='line'>from /usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:206:in &lt;code&gt;candidate_version_from_remote<span class="s1">&#39;</span>
-</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:373:in&lt;/code&gt;candidate_version&#39;</span>
+</span><span class='line'>/usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:89:in &lt;code&gt;with_gem_sources<span class="s1">&#39;: undefined method&lt;/code&gt;sources=&amp;lsquo; for Gem:Module (NoMethodError)</span>
+</span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:206:in &lt;code&gt;candidate_version_from_remote&#39;</span>
+</span><span class='line'>from /usr/lib/ruby/1.8/chef/provider/package/rubygems.rb:373:in&lt;/code&gt;candidate_version&amp;rsquo;
 </span><span class='line'>from /usr/lib/ruby/1.8/chef/provider/package.rb:44:in &lt;code&gt;action_install<span class="s1">&#39;</span>
 </span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/resource.rb:395:in&lt;/code&gt;send&#39;</span>
 </span><span class='line'>from /usr/lib/ruby/1.8/chef/resource.rb:395:in &lt;code&gt;run_action<span class="s1">&#39;</span>
@@ -188,21 +188,21 @@ so that chef-client and other tools that rely on rubygems will work.</p>
 </span><span class='line'><span class="s1">from /usr/lib/ruby/1.8/chef/application.rb:62:in&lt;/code&gt;run&#39;</span>
 </span><span class='line'>from /usr/bin/chef-client:26
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-A quick post to the opscode discussion forum (actually the wrong forum but jtimberman was kind enough to help out) told us that the error was the result of the outdated rubygems package. The easy solution was to simply use rubygem's own self-updating mechanism by running <code>gem update --system</code>. Easy enough, however the version installed by apt doesn't actually permit this:
+A quick post to the opscode discussion forum (actually the wrong forum but jtimberman was kind enough to help out) told us that the error was the result of the outdated rubygems package. The easy solution was to simply use rubygem&rsquo;s own self-updating mechanism by running <code>gem update --system</code>. Easy enough, however the version installed by apt doesn&rsquo;t actually permit this:
 <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
 <span class='line-number'>4</span>
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'>ERROR:  While executing gem ... <span class="o">(</span>RuntimeError<span class="o">)</span>&lt;/p&gt;
+</pre></td><td class='code'><pre><code class='bash'><span class='line'>ERROR:  While executing gem &amp;hellip; <span class="o">(</span>RuntimeError<span class="o">)</span>&lt;/p&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;pre&gt;&lt;code&gt;gem update --system is disabled on Debian. RubyGems can be updated using the official Debian repositories by aptitude or apt-get.
 </span><span class='line'>&lt;/code&gt;&lt;/pre&gt;
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-At this point we could have introduced new apt sources to see if they contained more recent versions, but we decided we really wanted rubygems to be able to update itself. Rather than reinstall rubygems from source, we found that there was a rubygem on rubygems.org for exactly this purpose "rubygems-update". Unfortunately for some reason, perhaps an incompatibility between rubygems 1.2.0 and rubygems.org, even after adding rubygems.org as a gem source, gem complained it was unable to find the repository online. Downloading the gem and installing it locally provided the fix for that:
+At this point we could have introduced new apt sources to see if they contained more recent versions, but we decided we really wanted rubygems to be able to update itself. Rather than reinstall rubygems from source, we found that there was a rubygem on rubygems.org for exactly this purpose &ldquo;rubygems-update&rdquo;. Unfortunately for some reason, perhaps an incompatibility between rubygems 1.2.0 and rubygems.org, even after adding rubygems.org as a gem source, gem complained it was unable to find the repository online. Downloading the gem and installing it locally provided the fix for that:
 <div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 <span class='line-number'>3</span>
@@ -220,8 +220,8 @@ At this point we could have introduced new apt sources to see if they contained 
 </span><span class='line'>
 </span><span class='line'>&lt;h1&gt;1.2.0&lt;/h1&gt;
 </span><span class='line'>
-</span><span class='line'>&lt;p&gt;wget http://production.cf.rubygems.org/gems/rubygems-update-1.4.2.gem
-</span><span class='line'>gem install rubygems-update-1.4.2.gem --local
+</span><span class='line'>&lt;p&gt;wget &lt;a <span class="nv">href</span><span class="o">=</span><span class="s2">&quot;http://production.cf.rubygems.org/gems/rubygems-update-1.4.2.gem&quot;</span>&gt;http://production.cf.rubygems.org/gems/rubygems-update-1.4.2.gem&lt;/a&gt;
+</span><span class='line'>gem install rubygems-update-1.4.2.gem &amp;mdash;local
 </span><span class='line'><span class="nb">cd</span> /var/lib/gems/1.8/bin
 </span><span class='line'>./update_rubygems
 </span><span class='line'>gem -v&lt;/p&gt;
@@ -230,16 +230,16 @@ At this point we could have introduced new apt sources to see if they contained 
 </span><span class='line'>
 </span><span class='line'>&lt;p&gt;
 </span></code></pre></td></tr></table></div></figure></notextile></div>
-Problem solved. With the new version of rubygems installed, we're now able to run gem update --system to stay up to date.</p>
+Problem solved. With the new version of rubygems installed, we&rsquo;re now able to run gem update &mdash;system to stay up to date.</p>
 
-<p>I believe rubygems was originally installed as a dependency of the chef package in the opscode apt repo, and the rubygems version in there is 1.2.0. So it appears that this problem would always occur when bootstrapping a new debian lenny machine with chef-client using only the apt packages, so I'll be switching to bootstrapping via the chef gems rather than using apt. I'll pose this question to the smart folks at opscode though and see if there isn't a simple answer to the package dependency issue.</p>
+<p>I believe rubygems was originally installed as a dependency of the chef package in the opscode apt repo, and the rubygems version in there is 1.2.0. So it appears that this problem would always occur when bootstrapping a new debian lenny machine with chef-client using only the apt packages, so I&rsquo;ll be switching to bootstrapping via the chef gems rather than using apt. I&rsquo;ll pose this question to the smart folks at opscode though and see if there isn&rsquo;t a simple answer to the package dependency issue.</p>
 ]]></content>
   </entry>
   
   <entry>
     <title type="html"><![CDATA[Querying Chef using the REST API]]></title>
     <link href="http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api"/>
-    <updated>2010-12-09T17:54:00-05:00</updated>
+    <updated>2010-12-09T17:54:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/Chef/querying-chef-using-the-rest-api</id>
     <content type="html"><![CDATA[<p>Assumptions: You have a working knife configuration.</p>
 
@@ -252,13 +252,13 @@ Problem solved. With the new version of rubygems installed, we're now able to ru
 </ul>
 
 
-<p>In order to access the Chef Server programmatically I first had to figure out authentication. Unfortunately, I couldn't find any good examples of how to actually do this. The Chef Server API wiki page has some basic requirements and concepts, but no concrete examples.</p>
+<p>In order to access the Chef Server programmatically I first had to figure out authentication. Unfortunately, I couldn&rsquo;t find any good examples of how to actually do this. The Chef Server API wiki page has some basic requirements and concepts, but no concrete examples.</p>
 
-<p>However, it gave me a good starting place--the Chef::REST library. The REST library that comes bundled with Chef in every version > 0.9.0. Let's just make sure that we actually have that version:</p>
+<p>However, it gave me a good starting place&mdash;the Chef::REST library. The REST library that comes bundled with Chef in every version > 0.9.0. Let&rsquo;s just make sure that we actually have that version:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>knife --version
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">$ </span>knife &amp;mdash;version
 </span><span class='line'>Chef: 0.9.12
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
@@ -271,13 +271,13 @@ Problem solved. With the new version of rubygems installed, we're now able to ru
 <span class='line-number'>5</span>
 <span class='line-number'>6</span>
 <span class='line-number'>7</span>
-</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;bundler/setup&#39;</span>
-</span><span class='line'><span class="nb">require</span> <span class="s1">&#39;chef&#39;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">bundler</span><span class="o">/</span><span class="n">setup</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span>
+</span><span class='line'><span class="nb">require</span> <span class="o">&amp;</span><span class="n">lsquo</span><span class="p">;</span><span class="n">chef</span><span class="o">&amp;</span><span class="n">rsquo</span><span class="p">;</span><span class="o">&lt;</span><span class="sr">/p&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="sr">&lt;p&gt;Chef::Config.from_file(&quot;/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">knife</span><span class="o">.</span><span class="n">rb</span><span class="s2">&quot;)</span>
-</span><span class='line'><span class="s2">rest = Chef::REST.new(“http://host:port”)&lt;/p&gt;</span>
+</span><span class='line'><span class="sr">&lt;p&gt;Chef::Config.from_file(&amp;ldquo;/</span><span class="n">path</span><span class="o">/</span><span class="n">to</span><span class="o">/</span><span class="n">knife</span><span class="o">.</span><span class="n">rb</span><span class="o">&amp;</span><span class="n">rdquo</span><span class="p">;)</span>
+</span><span class='line'><span class="n">rest</span> <span class="o">=</span> <span class="ss">Chef</span><span class="p">:</span><span class="ss">:REST</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="err">“</span><span class="o">&lt;</span><span class="n">a</span> <span class="n">href</span><span class="o">=</span><span class="s2">&quot;http://host:port%E2%80%9D&quot;</span><span class="o">&gt;</span><span class="ss">http</span><span class="p">:</span><span class="sr">//</span><span class="ss">host</span><span class="p">:</span><span class="n">port</span><span class="o">%</span><span class="no">E2</span><span class="o">%</span><span class="mi">80</span><span class="o">%</span><span class="mi">9</span><span class="n">D</span><span class="o">&lt;</span><span class="sr">/a&gt;)&lt;/</span><span class="nb">p</span><span class="o">&gt;</span>
 </span><span class='line'>
-</span><span class='line'><span class="s2">&lt;p&gt;nodes = rest.get_rest(“/nodes”)</span>
+</span><span class='line'><span class="o">&lt;</span><span class="nb">p</span><span class="o">&gt;</span><span class="n">nodes</span> <span class="o">=</span> <span class="n">rest</span><span class="o">.</span><span class="n">get_rest</span><span class="p">(</span><span class="err">“</span><span class="o">/</span><span class="n">nodes</span><span class="err">”</span><span class="p">)</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>Now you can do something like:</p>

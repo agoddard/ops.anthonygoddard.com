@@ -93,18 +93,18 @@
   
 
 
-<time datetime="2011-05-10T17:54:00-04:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
+<time datetime="2011-05-10T17:54:00+10:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I&#8217;d heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn&#8217;t realized how many cool features were due for release in 0.10.0 and I thought I&#8217;d mention a few of my favorite and perhaps lesser known new features here.</p>
+<div class="entry-content"><p>No sooner than I drafted my <a href="http://crankstations.com/cookbooks-as-gems">last post</a>, Opscode released released a huge update to Chef, 0.10.0. Being on on vacation during the lead up to the release, I missed a few of the pre-release announcements, so while I&rsquo;d heard that some big features, such as <a href="http://www.opscode.com/blog/2011/04/21/chef-0-10-preview-environments/">environments</a> were coming, I hadn&rsquo;t realized how many cool features were due for release in 0.10.0 and I thought I&rsquo;d mention a few of my favorite and perhaps lesser known new features here.</p>
 
 <h2>Knife Plugins</h2>
 
-<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don&#8217;t need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There&#8217;s a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
+<p>Co-incidentally, the 0.10.0 release came out the same week that we started work on our first knife plugin, and the new architecture has made the process very straightforward. You don&rsquo;t need to delve into to depths of your gems to extend knife, you can simply throw the plugin in a .chef/plugins/knife directory in your home folder or in your cookbook repo. There&rsquo;s a quick guide to get you started on the <a href="http://www.opscode.com/blog/2011/04/22/chef-0-10-preview-knife-plugins-and-ui/">Opscode blog</a>.</p>
 
 <h2>Encrypted Data Bags</h2>
 
@@ -112,15 +112,15 @@
 
 <h2>Chef Expander</h2>
 
-<p>This behind the scenes update will probably stay out of your way for the most part, but it&#8217;s cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it&#8217;s nice to know that this can scale horizontally as your infrastructure grows.</p>
+<p>This behind the scenes update will probably stay out of your way for the most part, but it&rsquo;s cool all the same. Indexing is now taken care of by a new tool called <a href="http://wiki.opscode.com/display/chef/Chef+Indexer#ChefIndexer-ChefExpander">chef-expander</a>, which replaces the old chef-solr-indexer. The cool thing about chef-expander is the ability to setup a cluster of worker nodes to farm out the indexing process. Small installations are fine with just one process running, but it&rsquo;s nice to know that this can scale horizontally as your infrastructure grows.</p>
 
 <h2>Cookbook Versioning</h2>
 
-<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I&#8217;d like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I&#8217;m very excited to see how this evolves as Chef moves beyond 0.10</p>
+<p>In my recent post <a href="http://crankstations.com/cookbooks-as-gems">cookbooks as gems</a> I mentioned a few features I&rsquo;d like to see in the cookbooks architecture, the main one being a straightforward way of managing different versions of cookbooks. Version 0.10 addresses this and more, including the ability to freeze cookbooks when uploading to the Chef server and the option to set cookbook version constraints in environments. Judging by the upgrades to the cookbook features in knife and their latest <a href="http://www.opscode.com/blog/2011/05/05/future-of-opscode-cookbooks/">post on the community cookbook site</a> cookbooks management is definitely a high priority in Chef I&rsquo;m very excited to see how this evolves as Chef moves beyond 0.10</p>
 
 <h2>Upgrading</h2>
 
-<p>If the above features aren&#8217;t a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
+<p>If the above features aren&rsquo;t a good enough argument to upgrade straight away, check out the <a href="http://www.opscode.com/blog/2011/05/02/chef-0-10-0-released/">release notes</a> for a full account of what 0.10.0 brings to the table. The 0.10.0 server is compatible with 0.9.x clients, and the process for upgrading both the server and clients is trivial. Instructions can be found on the <a href="http://wiki.opscode.com/display/chef/Upgrading+Chef+0.9.x+to+Chef+0.10.x">Opscode wiki</a>.</p>
 </div>
 
 
@@ -143,7 +143,7 @@
   
 
 
-<time datetime="2011-05-10T17:54:00-04:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
+<time datetime="2011-05-10T17:54:00+10:00" pubdate data-updated="true">May 10<span>th</span>, 2011</time>
       
 
 <span class="categories">
@@ -157,7 +157,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0" data-via="" data-counturl="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0" data-via="anthonygoddard" data-counturl="http://ops.anthonygoddard.com/Chef/some-nice-new-features-in-chef-0-dot-10-dot-0" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>

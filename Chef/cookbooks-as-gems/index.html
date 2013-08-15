@@ -93,7 +93,7 @@
   
 
 
-<time datetime="2011-05-04T17:54:00-04:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+<time datetime="2011-05-04T17:54:00+10:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
         
       </p>
     
@@ -108,17 +108,17 @@
 <li>As a sysadmin
 
 <ul>
-<li>I&#8217;d like to version cookbooks and download custom cookbooks</li>
+<li>I&rsquo;d like to version cookbooks and download custom cookbooks</li>
 <li>  so that I can better manage cookbook dependencies.</li>
 </ul>
 </li>
 </ul>
 
 
-<p>I&#8217;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&#8217;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &#8216;vendor&#8217; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&#8217;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
-*   &#8220;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &#8221;
-*   &#8220;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&#8217;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&#8221;
-*   &#8220;I&#8217;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&#8221; Rather than get into too much detail about those specific cases, I thought I&#8217;d provide an example of what a rubygems-esque cookbook management process might look like</p>
+<p>I&rsquo;ve been thinking a lot about what the future of the Opscode community cookbooks site / API might look like. Every way I think about it, I keep coming back to a model similar to that of Ruby gems and I&rsquo;m interested in knowing if this view is shared and to what extent this parallel makes sense. I think the cookbooks site as it stands is great and in some senses, the cookbooks site is really the heart of chef. Without having such an easy path to &lsquo;vendor&rsquo; the apache2 cookbook for example, the experience of first time chef users might not be the wonderful experience it is today. There are however some cases which users might come across which don&rsquo;t (at least obviously) have a solution in the current cookbooks site, and it would be great to see if the community can solve some of these. The scenarios that immediately come to mind are:
+*   &ldquo;The new Y cookbook broke my X cookbook, I need the X cookbook to be dependent on the <em>old</em> version of Y until I can fix it &rdquo;
+*   &ldquo;My friend just sent me a cookbook she wrote, which depends on a version of the apache2 cookbook which she modified, I&rsquo;d like to install her apache2 cookbook and use it alongside the default community apache2 cookbook&rdquo;
+*   &ldquo;I&rsquo;ve seen cookbooks on github, such as at 37Signals. Can I also use knife to install and manage these cookbooks?&rdquo; Rather than get into too much detail about those specific cases, I thought I&rsquo;d provide an example of what a rubygems-esque cookbook management process might look like</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -133,7 +133,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>&#8230;and how these might look in a recipe&#8230;</p>
+<p>&hellip;and how these might look in a recipe&hellip;</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -150,7 +150,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>I&#8217;m sure there&#8217;s things I&#8217;m missing here, but I&#8217;d love to see where this concept leads.. cookbooks already support versioning but I&#8217;m not sure if there&#8217;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&#8217;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&#8217;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&#8217;t ideal, but it&#8217;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&#8217;m sure there are many other approaches to this same issue and I&#8217;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&#8217;m looking at the beginnings of something big, like github or rubygems and I&#8217;m excited to see where it goes.</p>
+<p>I&rsquo;m sure there&rsquo;s things I&rsquo;m missing here, but I&rsquo;d love to see where this concept leads.. cookbooks already support versioning but I&rsquo;m not sure if there&rsquo;s a simple way of maintaining two versions and having legacy cookbooks support the older one. It&rsquo;s obviously currently possible to manually install any cookbook you like, though you then loose the added benefits of using the knife site vendor command, such as branching and dependency resolution. Another area this might help is in keeping cookbooks up to date. Currently if a user wants to update a cookbook, they will fork the cookbook, apply their changes and then send the maintainer a pull request. If the maintainer is unavailable, it&rsquo;s hard for the changes to get back to the community. If in this case the user submitting the changes could simply upload their modified cookbook to the cookbooks site, prefixed with their username (to distinguish it from the main / official cookbook) then the cookbook will be available to the community while they wait for the official version to be patched, tested etc. This isn&rsquo;t ideal, but it&rsquo;s more ideal than an update to your chef server breaking an important cookbook which is reliant on a deprecated feature of the server, for example. I&rsquo;m sure there are many other approaches to this same issue and I&rsquo;d love to know what others think. The cookbooks site is a fantastic feature and when I look at it, I feel like I&rsquo;m looking at the beginnings of something big, like github or rubygems and I&rsquo;m excited to see where it goes.</p>
 </div>
 
 
@@ -173,7 +173,7 @@
   
 
 
-<time datetime="2011-05-04T17:54:00-04:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
+<time datetime="2011-05-04T17:54:00+10:00" pubdate data-updated="true">May 4<span>th</span>, 2011</time>
       
 
 <span class="categories">
@@ -187,7 +187,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems" data-via="" data-counturl="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems" data-via="anthonygoddard" data-counturl="http://ops.anthonygoddard.com/Chef/cookbooks-as-gems" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>

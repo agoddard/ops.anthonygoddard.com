@@ -94,7 +94,7 @@ so that I can setup test clusters in development &hellip;">
   
 
 
-<time datetime="2011-08-15T17:54:00-04:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
+<time datetime="2011-08-15T17:54:00+10:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
         
       </p>
     
@@ -114,16 +114,16 @@ so that I can setup test clusters in development &hellip;">
 </ul>
 
 
-<p>As a sysadmin, I&#8217;m a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it&#8217;s nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout.
-Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it&#8217;s nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™.</p>
+<p>As a sysadmin, I&rsquo;m a big fan of simplicity of the libvirt ecosystem. Installing and configuring KVM and libvirt is a straightforward experience, and when learning the API, it&rsquo;s nice to know that knowledge will extend beyond the next release cycle, product licensing change or corportate buyout.
+Using vm-builder makes provisioning simple guests fast, efficient and flexible with a ton of automated configuration options. On the dev side, provisioning Virtual machines for testing and development have always been a bit of a pain. Creating multiple images for devs and customizing all their settings can be a tedious process, it can be slow to physically get the VMs to the devs, and multiple variations either take a bunch of handholding or multiple images and lots more disk space. Of course, libvirt is an option on workstations also, it&rsquo;s nice and simple to install these days thanks to brew, but still requires a decent amount of configuration, especially in a dev environment when things Should Just Work™.</p>
 
 <h3>Enter Vagrant</h3>
 
 <p><a href="http://vagrantup.com">Vagrant</a> is a ruby gem which performs automated building and provisioning of VirtualBox machines. Vagrant takes care of all the behind the scenes work with VirtualBox, so while you need VirtualBox installed, you technically never even need to launch the app.</p>
 
-<p><em>So what? Double clicking an app doesn&#8217;t take much time, and I get to use a nice GUI.</em></p>
+<p><em>So what? Double clicking an app doesn&rsquo;t take much time, and I get to use a nice GUI.</em></p>
 
-<p>A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here&#8217;s a simple example of getting up and running (I&#8217;ve trimmed a bit of the verbosity from the responses, but this is honestly it:</p>
+<p>A ha, this is where the awesomeness begins. To see why vagrant is so awesome, here&rsquo;s a simple example of getting up and running (I&rsquo;ve trimmed a bit of the verbosity from the responses, but this is honestly it:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -156,7 +156,7 @@ Using vm-builder makes provisioning simple guests fast, efficient and flexible w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>So what&#8217;s actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn&#8217;t get much simpler than this:</p>
+<p>So what&rsquo;s actually going on there? Basically, the lucid64.box is a preconfigured template, containing a base install of ubuntu 10.04, a pre-defined vagrant user and some tools for open box. When initializing the machine, vagrant creates a Vagrantfile which is a simple ruby configuration script. How simple you ask? It doesn&rsquo;t get much simpler than this:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -169,7 +169,7 @@ Using vm-builder makes provisioning simple guests fast, efficient and flexible w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Of course, simple doesn&#8217;t mean it&#8217;s lacking in ability - there&#8217;s a <a href="http://vagrantup.com/v1/docs/vagrantfile.html">whole host of configuration options</a> you can specify from simple <a href="http://vagrantup.com/v1/docs/config/vm/customize.html">ram</a> settings to <a href="http://vagrantup.com/v1/docs/provisioners.html">auto provisioning</a> with <a href="http://vagrantup.com/v1/docs/provisioners/chef_solo.html">chef</a>, <a href="http://vagrantup.com/v1/docs/provisioners/puppet.html">puppet</a> or even simple <a href="http://vagrantup.com/v1/docs/provisioners/shell.html">bash scripts</a>. Here&#8217;s an example with a few more options thrown in:</p>
+<p>Of course, simple doesn&rsquo;t mean it&rsquo;s lacking in ability &ndash; there&rsquo;s a <a href="http://vagrantup.com/v1/docs/vagrantfile.html">whole host of configuration options</a> you can specify from simple <a href="http://vagrantup.com/v1/docs/config/vm/customize.html">ram</a> settings to <a href="http://vagrantup.com/v1/docs/provisioners.html">auto provisioning</a> with <a href="http://vagrantup.com/v1/docs/provisioners/chef_solo.html">chef</a>, <a href="http://vagrantup.com/v1/docs/provisioners/puppet.html">puppet</a> or even simple <a href="http://vagrantup.com/v1/docs/provisioners/shell.html">bash scripts</a>. Here&rsquo;s an example with a few more options thrown in:</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -188,14 +188,14 @@ Using vm-builder makes provisioning simple guests fast, efficient and flexible w
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>What about when you&#8217;re done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I&#8217;ll suggest you check out the [docs] and see for yourself.</p>
+<p>What about when you&rsquo;re done? you can simply power off the VM, suspend it, or destroy it, deleting its disks There really is a ton of customization you can run on these things, so before I get too carried away, I&rsquo;ll suggest you check out the [docs] and see for yourself.</p>
 
-<p><em>What about security? Who made this &#8220;box&#8221; file?</em></p>
+<p><em>What about security? Who made this &ldquo;box&rdquo; file?</em></p>
 
 <p>I hear you, but fear not. For those who want to build their own boxes, not only is this possible, but with a tool called <a href="https://github.com/jedi4ever/veewee">veewee</a>, <a href="http://twitter.com/patrickdebois">@patrickdebois</a> has made is insanely easy.
-I&#8217;ll cover that in a followup post, but rest assured, this is Not a Problem™.</p>
+I&rsquo;ll cover that in a followup post, but rest assured, this is Not a Problem™.</p>
 
-<p>But wait, there&#8217;s more&#8230;</p>
+<p>But wait, there&rsquo;s more&hellip;</p>
 
 <p>You can have more than one VM in a Vagrantfile and when assigned IPs, such as in the example above, these hosts can communicate over a private, host-only network. This paves the way for setting up whole stacks / clusters on a single host, bringing dev/test-like-prod nirvana just one step closer.</p>
 </div>
@@ -220,7 +220,7 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
   
 
 
-<time datetime="2011-08-15T17:54:00-04:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
+<time datetime="2011-08-15T17:54:00+10:00" pubdate data-updated="true">Aug 15<span>th</span>, 2011</time>
       
 
 <span class="categories">
@@ -234,7 +234,7 @@ I&#8217;ll cover that in a followup post, but rest assured, this is Not a Proble
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/Vagrant/vagrant" data-via="" data-counturl="http://ops.anthonygoddard.com/Vagrant/vagrant" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/Vagrant/vagrant" data-via="anthonygoddard" data-counturl="http://ops.anthonygoddard.com/Vagrant/vagrant" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>

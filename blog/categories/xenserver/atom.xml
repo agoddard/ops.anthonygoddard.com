@@ -4,7 +4,7 @@
   <title><![CDATA[Category: XenServer | Anthony Goddard]]></title>
   <link href="http://ops.anthonygoddard.com/blog/categories/xenserver/atom.xml" rel="self"/>
   <link href="http://ops.anthonygoddard.com/"/>
-  <updated>2013-04-14T20:52:24-04:00</updated>
+  <updated>2013-08-15T15:48:26+10:00</updated>
   <id>http://ops.anthonygoddard.com/</id>
   <author>
     <name><![CDATA[Anthony Goddard]]></name>
@@ -16,9 +16,9 @@
   <entry>
     <title type="html"><![CDATA[Basic XenServer CLI use]]></title>
     <link href="http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use"/>
-    <updated>2010-12-10T17:54:00-05:00</updated>
+    <updated>2010-12-10T17:54:00+11:00</updated>
     <id>http://ops.anthonygoddard.com/XenServer/basic-xenserver-cli-use</id>
-    <content type="html"><![CDATA[<p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer's 'xsconsole' tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
+    <content type="html"><![CDATA[<p>I recently found myself in a situation where I had to manage a XenServer resource pool over SSH. XenServer&rsquo;s &lsquo;xsconsole&rsquo; tool provided me with a lot of options, but none that would allow me to boot a guest which was powered off.</p>
 
 <p>User Story:</p>
 
@@ -26,9 +26,9 @@
 I need to start a XenServer guest from the command line
 so that I can start guests without having to use a GUI.</p>
 
-<p>When using Resource Pools, there is no way within the console to boot machines which are powered off - attempting to view all machines results in the error message: "This feature is unavailable in Pools with more than 100 Virtual Machines", even if you have less than 100 virtual machines.</p>
+<p>When using Resource Pools, there is no way within the console to boot machines which are powered off &ndash; attempting to view all machines results in the error message: &ldquo;This feature is unavailable in Pools with more than 100 Virtual Machines&rdquo;, even if you have less than 100 virtual machines.</p>
 
-<p>Here's where the XenServer command line applications come in handy. In order to boot a machine which is powered off, you can ssh to any machine in the pool and run <code>xe vm-list</code></p>
+<p>Here&rsquo;s where the XenServer command line applications come in handy. In order to boot a machine which is powered off, you can ssh to any machine in the pool and run <code>xe vm-list</code></p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -43,7 +43,7 @@ so that I can start guests without having to use a GUI.</p>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 
 <p>This will show you all of your machines by name, state and uuid. Once you find the machine you want to boot, simply run <code>xe vm-start</code> and pass it the uuid you want to boot:
-[code lang='bash']
+[code lang=&lsquo;bash&rsquo;]
 [root@ubio-vmh07 ~]# xe vm-start uuid=0ebb9d7d-1743-f9a0-f5b8-692930cc3ad0
 [/code]</p>
 
@@ -52,7 +52,7 @@ so that I can start guests without having to use a GUI.</p>
 <p>The xe help will show you a list of available commands:</p>
 
 <p><div class='bogus-wrapper'><notextile><figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
-</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c"># xe help --all</span>
+</pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="o">[</span>root@ubio-vmh07 ~<span class="o">]</span><span class="c"># xe help &amp;mdash;all</span>
 </span></code></pre></td></tr></table></div></figure></notextile></div></p>
 ]]></content>
   </entry>

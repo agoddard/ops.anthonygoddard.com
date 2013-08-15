@@ -9,7 +9,7 @@
   <meta name="author" content="Anthony Goddard">
 
   
-  <meta name="description" content="I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. &hellip;">
+  <meta name="description" content="I&rsquo;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -93,16 +93,16 @@
   
 
 
-<time datetime="2012-11-17T22:28:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
+<time datetime="2012-11-17T22:28:00+11:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>I&#8217;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&#8217;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&#8217;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I&#8217;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
+<div class="entry-content"><p>I&rsquo;ve been playing with OpenStack on and off since it was released, but recently I had the opportunity to finally build a production cluster. One of our requirements was to keep our storage as fast as possible, and we already had a bunch of hosts with quick disks, so this meant keeping instance storage on local disk and using raw disk backed VMs rather than file backed VMs. While it&rsquo;s always been easy to attach local disk to VMs, doing it automatically through orchestration tools hasn&rsquo;t been simple.  As of the latest release (Folsom), OpenStack supports the provisioning of instance storage onto local <a href="http://http://en.wikipedia.org/wiki/Logical_Volume_Manager_(Linux)">LVM volumes</a>, which is exactly what we needed. In order to configure local LVM storage for instances. I&rsquo;ve read a few different docs that describe how to do it, but they seem to use different syntax, the following is what worked for me:</p>
 
-<figure class='code'><figcaption><span>nova.conf on compute node </span></figcaption>
+<figure class='code'><figcaption><span>nova.conf on compute node</span></figcaption>
  <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
 </pre></td><td class='code'><pre><code class='bash'><span class='line'><span class="nv">libvirt_images_type</span><span class="o">=</span>lvm
@@ -110,7 +110,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &#8220;nova_local&#8221; which can be done as follows.</p>
+<p>Any compute node you want to use local storage on requires those lines in the nova.conf file. You will also need to create a local LVM volume group called &ldquo;nova_local&rdquo; which can be done as follows.</p>
 
 <figure class='code'> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -121,11 +121,11 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p>Running <code>vgs</code> should now show a &#8220;nova_local&#8221; volume group.</p>
+<p>Running <code>vgs</code> should now show a &ldquo;nova_local&rdquo; volume group.</p>
 
-<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&#8217;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
+<p>Nova will by default store disk image files in the /var/lib/nova/images directory, so these LVM volumes aren&rsquo;t any more susceptible to local disk failures as the default configuration, but many people will mount shared storage to the nova images directory for high availability. In my case, I opted for high availability of persistent storage (through OpenStack Cinder), and performance on local stoage. One of the main reasons for this is that the bulk of our infrastructure can be quickly rebuilt by Chef, so in this case day to day performance trumps high availability.</p>
 
-<p><strong>Update:</strong> If you&#8217;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&#8217;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
+<p><strong>Update:</strong> If you&rsquo;re running OpenStack on Ubuntu 12.04+, or CentOS 6.2, there&rsquo;s a <a href="https://answers.launchpad.net/nova/+question/211112">bug</a> which prevents LVM volumes being deleted when you attempt delete an instance. Until a patch is released for OpenStack, the workaround is to patch <code>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</code> as follows:</p>
 
 <figure class='code'><figcaption><span>/usr/lib/python2.7/dist-packages/nova/virt/libvirt/utils.py</span><a href='https://answers.launchpad.net/nova/+question/211112'>link</a></figcaption> <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
 <span class='line-number'>2</span>
@@ -134,7 +134,7 @@
 </span></code></pre></td></tr></table></div></figure>
 
 
-<p><a id="update2"></a><strong>Update #2:</strong> There&#8217;s a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there&#8217;s a patch for folsom and grizzly - <a href="http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/">details here</a></p>
+<p><a id="update2"></a><strong>Update #2:</strong> There&rsquo;s a security bug in the folsom and grizzly implementation where a volume being reallocated could potentially contain data from its original allocation, there&rsquo;s a patch for folsom and grizzly &ndash; <a href="http://secstack.org/2012/12/cve-2012-5625-information-leak-in-libvirt-lvm-backed-instances/">details here</a></p>
 </div>
 
 
@@ -157,7 +157,7 @@
   
 
 
-<time datetime="2012-11-17T22:28:00-05:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
+<time datetime="2012-11-17T22:28:00+11:00" pubdate data-updated="true">Nov 17<span>th</span>, 2012</time>
       
 
 <span class="categories">
@@ -171,7 +171,7 @@
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage" data-via="" data-counturl="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage" data-via="anthonygoddard" data-counturl="http://ops.anthonygoddard.com/OpenStack/openstack-local-lvm-instance-storage" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>

@@ -9,7 +9,7 @@
   <meta name="author" content="Anthony Goddard">
 
   
-  <meta name="description" content="With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&#8217;re not careful, both in Nova and in &hellip;">
+  <meta name="description" content="With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&rsquo;re not careful, both in Nova and in &hellip;">
   
 
   <!-- http://t.co/dKP3o1e -->
@@ -93,14 +93,14 @@
   
 
 
-<time datetime="2013-01-22T00:04:00-05:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2013</time>
+<time datetime="2013-01-22T00:04:00+11:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2013</time>
         
       </p>
     
   </header>
 
 
-<div class="entry-content"><p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&#8217;re not careful, both in Nova and in Cinder.</p>
+<div class="entry-content"><p>With the changes introduced in OpenStack Folsom, there are a few areas where quotas can trip you up if you&rsquo;re not careful, both in Nova and in Cinder.</p>
 
 <h1>Nova Quotas</h1>
 
@@ -130,7 +130,7 @@ agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------------------------+--------+
 </code></pre>
 
-<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won&#8217;t actually reference the tenant (or any tenant for that matter):</p>
+<p>The tricky part is that setting or viewing the quota using a name will appear to work but it won&rsquo;t actually reference the tenant (or any tenant for that matter):</p>
 
 <pre><code>agoddard@control1:~# nova quota-show ops
 +-----------------------------+-------+
@@ -150,7 +150,7 @@ agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 
 <p>As you can see, floating IPs, ram and volumes are all different when using the name rather than UUID.</p>
 
-<p>It get&#8217;s a little stranger - what if we just make up a tenant:</p>
+<p>It get&rsquo;s a little stranger &ndash; what if we just make up a tenant:</p>
 
 <pre><code>agoddard@control1:~# nova quota-show nonexistent-tenant
 +-----------------------------+-------+
@@ -183,15 +183,15 @@ agoddard@control1:~# nova quota-show nonexistent-tenant
 +-----------------------------+-------+
 </code></pre>
 
-<p>Nova created an entry for the tenant, even though the tenant doesn&#8217;t exist. This is what makes it appear that a change has been made when it hasn&#8217;t, and without an error being thrown, things can get pretty confusing.</p>
+<p>Nova created an entry for the tenant, even though the tenant doesn&rsquo;t exist. This is what makes it appear that a change has been made when it hasn&rsquo;t, and without an error being thrown, things can get pretty confusing.</p>
 
 <p><strong>Long story short, always use the UUID of a tenant when setting quotas.</strong></p>
 
 <h1>Cinder Quotas</h1>
 
-<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID&#8217;s wouldn&#8217;t work for me.</p>
+<p>I recently found myself having to increase cinder volume quotas for a tenant, from 50TB to 60TB, and got caught in a similar situation to above, however in this case even the UUID&rsquo;s wouldn&rsquo;t work for me.</p>
 
-<p>First, we can check the tenant&#8217;s quota, which is 50TB:</p>
+<p>First, we can check the tenant&rsquo;s quota, which is 50TB:</p>
 
 <pre><code>agoddard@control1:~# nova quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------------------------+--------+
@@ -233,7 +233,7 @@ agoddard@control1:~# nova quota-show nonexistent-tenant
 </code></pre>
 
 <p>It appears like everything is fine, however when I try to add additional volume space about 50TB, I get an API error about exceeding my quota, and Horizon shows the quota as 50TB.
-By checking the quota with the <code>cinder</code> command, we can see that the quota update didn&#8217;t actually have any effect at all:</p>
+By checking the quota with the <code>cinder</code> command, we can see that the quota update didn&rsquo;t actually have any effect at all:</p>
 
 <pre><code>agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
 +-----------+-------+
@@ -281,7 +281,7 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
   
 
 
-<time datetime="2013-01-22T00:04:00-05:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2013</time>
+<time datetime="2013-01-22T00:04:00+11:00" pubdate data-updated="true">Jan 22<span>nd</span>, 2013</time>
       
 
 <span class="categories">
@@ -295,7 +295,7 @@ agoddard@control1:~# cinder quota-show 9af32c41cee140779d50afb2bc93e322
     
       <div class="sharing">
   
-  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas" data-via="" data-counturl="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas" >Tweet</a>
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas" data-via="anthonygoddard" data-counturl="http://ops.anthonygoddard.com/OpenStack/demystifying-openstack-folsom-quotas" >Tweet</a>
   
   
   <div class="g-plusone" data-size="medium"></div>

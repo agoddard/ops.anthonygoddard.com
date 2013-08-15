@@ -1,0 +1,377 @@
+
+<!DOCTYPE html>
+<!--[if IEMobile 7 ]><html class="no-js iem7"><![endif]-->
+<!--[if lt IE 9]><html class="no-js lte-ie8"><![endif]-->
+<!--[if (gt IE 8)|(gt IEMobile 7)|!(IEMobile)|!(IE)]><!--><html class="no-js" lang="en"><!--<![endif]-->
+<head>
+  <meta charset="utf-8">
+  <title>PaaS in under 10 minutes &laquo;   &laquo;  Anthony Goddard &laquo; DevOps</title>
+  <meta name="author" content="Anthony Goddard">
+
+  
+  <meta name="description" content="PaaS in under 10 minutes (or, &ldquo;Let&rsquo;s see if building a PaaS and deploying an app is faster than formatting a disk&rdquo;). We recently &hellip;">
+  
+
+  <!-- http://t.co/dKP3o1e -->
+  <meta name="HandheldFriendly" content="True">
+  <meta name="MobileOptimized" content="320">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  
+  <link rel="canonical" href="http://ops.anthonygoddard.com/paas-in-under-10-minutes">
+  <link href="/favicon.ico" rel="icon">
+  
+  <link href="/stylesheets/screen.css" media="screen, projection" rel="stylesheet" type="text/css">
+  <script src="/javascripts/modernizr-2.0.js"></script>
+  <script src="/javascripts/ender.js"></script>
+  <script src="/javascripts/octopress.js" type="text/javascript"></script>
+  <link href="/atom.xml" rel="alternate" title="Anthony Goddard" type="application/atom+xml">
+  <!--Fonts from Google"s Web font directory at http://google.com/webfonts -->
+<link href="http://fonts.googleapis.com/css?family=PT+Serif:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+<link href="http://fonts.googleapis.com/css?family=PT+Sans:regular,italic,bold,bolditalic" rel="stylesheet" type="text/css">
+
+  
+  <script type="text/javascript">
+    var _gaq = _gaq || [];
+    _gaq.push(['_setAccount', 'UA-5921706-2']);
+    _gaq.push(['_trackPageview']);
+
+    (function() {
+      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+    })();
+  </script>
+
+
+</head>
+
+<body   class="no-sidebar"  >
+  <header role="banner"><hgroup>
+  <h1>Anthony Goddard</h1>
+  
+    <h2><a href="/">OPS</a></h2>
+  
+</hgroup>
+
+</header>
+  <nav role="navigation">
+  
+<form action="http://google.com/search" method="get">
+  <fieldset role="search">
+    <input type="hidden" name="q" value="site:ops.anthonygoddard.com" />
+    <input class="search" type="text" name="q" results="0" placeholder="Search"/>
+  </fieldset>
+</form>
+  
+<ul class="main-navigation">
+  <li><a href="https://github.com/agoddard">Code</a></li>
+  <li><a href="/blog/archives">Archives</a></li>
+</ul>
+
+</nav>
+  <div id="main">
+    <div id="content">
+      <div>
+<article class="hentry" role="article">
+  
+  <header>
+    
+      <h1 class="entry-title">PaaS in Under 10 Minutes</h1>
+    
+    
+      <p class="meta">
+        
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-16T22:58:00+10:00" pubdate data-updated="true">Jun 16<span>th</span>, 2013</time>
+        
+      </p>
+    
+  </header>
+
+
+<div class="entry-content"><p>PaaS in under 10 minutes (or, &ldquo;Let&rsquo;s see if building a PaaS and deploying an app is faster than formatting a disk&rdquo;).</p>
+
+<p>We recently had some 4TB (RAID-0) external drives shipped to us to fill with BHL(biodiversitylibrary.org) content, we needed to format them as ext4 and then fill them up with books. Formatting the disks took a while, so I decided that for the next disk, I would see if I could setup a PaaS using Dokku, a cool little set of bash scripts that do some proxy, building &amp; assorted magic on top of docker. And then deploy an app to it. Here&rsquo;s how it panned out.</p>
+
+<h1>start the ext4 format:</h1>
+
+<pre><code>[16:10:41] [root@clustr-03 /root]# date;mkfs.ext4 /dev/sdz1
+Thu Jun 13 16:12:35 EDT 2013
+
+Writing inode tables:  1/29809
+</code></pre>
+
+<h1>prep the server with dokku</h1>
+
+<pre><code>$ wget -qO- https://raw.github.com/progrium/dokku/master/bootstrap.sh | sudo bash
+</code></pre>
+
+<p>We&rsquo;ll let that bake for a little while</p>
+
+<h1>setup app</h1>
+
+<pre><code>~/dev $ date;mkdir awyeah
+Thu Jun 13 16:12:55 EDT 2013
+~/dev $ cd awyeah/
+~/dev/awyeah $ bundle init
+~/dev/awyeah $ touch web.rb
+~/dev/awyeah $ touch config.ru
+~/dev/awyeah $ vim Gemfile
+</code></pre>
+
+<figure class='code'><figcaption><span>web.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'>    <span class="n">source</span> <span class="s2">&quot;https://rubygems.org&quot;</span>
+</span><span class='line'>    <span class="n">ruby</span> <span class="s2">&quot;1.9.3&quot;</span>
+</span><span class='line'>    <span class="n">gem</span> <span class="s1">&#39;sinatra&#39;</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code>~/dev/awyeah $ vim web.rb
+</code></pre>
+
+<figure class='code'><figcaption><span>web.rb</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+<span class='line-number'>3</span>
+<span class='line-number'>4</span>
+<span class='line-number'>5</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;sinatra&#39;</span>
+</span><span class='line'>
+</span><span class='line'><span class="n">get</span> <span class="s1">&#39;/&#39;</span> <span class="k">do</span>
+</span><span class='line'>  <span class="s2">&quot;awwwwyeah!!!&quot;</span>
+</span><span class='line'><span class="k">end</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<h1>time check</h1>
+
+<pre><code>~/dev/awyeah $ date;vim config.ru
+Thu Jun 13 16:14:05 EDT 2013
+</code></pre>
+
+<figure class='code'><figcaption><span>config.ru</span></figcaption>
+ <div class="highlight"><table><tr><td class="gutter"><pre class="line-numbers"><span class='line-number'>1</span>
+<span class='line-number'>2</span>
+</pre></td><td class='code'><pre><code class='ruby'><span class='line'><span class="nb">require</span> <span class="s1">&#39;./web.rb&#39;</span>
+</span><span class='line'><span class="n">run</span> <span class="ss">Sinatra</span><span class="p">:</span><span class="ss">:Application</span>
+</span></code></pre></td></tr></table></div></figure>
+
+
+<pre><code>~/dev/awyeah $ git init .
+Initialized empty Git repository in /Users/agoddard/dev/awyeah/.git/
+~/dev/awyeah (master) $ git add .
+~/dev/awyeah (master) $ git ci -am "awwyeah initial commit"
+[master (root-commit) ade6ea2] awwyeah initial commit
+ 3 files changed, 10 insertions(+)
+ create mode 100644 Gemfile
+ create mode 100644 config.ru
+ create mode 100644 web.rb
+~/dev/awyeah (master) $ git remote add deploy git@deploy.eol.org:awwyeah
+~/dev/awyeah (master) $ bundle
+Fetching gem metadata from https://rubygems.org/...........
+Fetching gem metadata from https://rubygems.org/..
+Resolving dependencies...
+Installing rack (1.5.2)
+Installing rack-protection (1.5.0)
+Installing tilt (1.4.1)
+Installing sinatra (1.4.3)
+Using bundler (1.3.5)
+Your bundle is complete!
+Use `bundle show [gemname]` to see where a bundled gem is installed.
+~/dev/awyeah (master) $ git ci -am "added Gemfile.lock"
+[master 787cdaa] added Gemfile.lock
+ 1 file changed, 17 insertions(+)
+ create mode 100644 Gemfile.lock
+</code></pre>
+
+<h1>back to server</h1>
+
+<pre><code>[...]
+nginx-reloader start/running, process 26946
+Be sure to upload a public key for your user:
+ cat ~/.ssh/id_rsa.pub | ssh root@deploy.eol.org "gitreceive upload-key ag"
+</code></pre>
+
+<p>looks good, let&rsquo;s finish it off</p>
+
+<pre><code>cat ~/.ssh/id_rsa.pub | ssh root@deploy.eol.org "gitreceive upload-key ag"
+</code></pre>
+
+<h1>ship it!</h1>
+
+<pre><code>~/dev/awyeah (master) $ git push deploy master
+Counting objects: 4, done.
+Delta compression using up to 8 threads.
+Compressing objects: 100% (3/3), done.
+Writing objects: 100% (3/3), 500 bytes | 0 bytes/s, done.
+Total 3 (delta 0), reused 0 (delta 0)
+remote: -----&gt; Building awwyeah ...
+remote:        Ruby/Rack app detected
+remote: -----&gt; Using Ruby version: ruby-1.9.3
+remote: -----&gt; Installing dependencies using Bundler version 1.3.2
+remote:        Running: bundle install --without development:test --path vendor/bundle --binstubs vendor/bundle/bin --deployment
+remote:        Fetching gem metadata from https://rubygems.org/..........
+remote:        Fetching gem metadata from https://rubygems.org/..
+remote:        Installing rack (1.5.2)
+remote:        Installing rack-protection (1.5.0)
+remote:        Installing tilt (1.4.1)
+remote:        Installing sinatra (1.4.3)
+remote:        Using bundler (1.3.2)
+remote:        Your bundle is complete! It was installed into ./vendor/bundle
+remote:        Cleaning up the bundler cache.
+remote: -----&gt; Discovering process types
+remote:        Default process types for Ruby/Rack -&gt; rake, console, web
+remote: -----&gt; Build complete!
+remote: -----&gt; Deploying awwyeah ...
+remote: -----&gt; Application deployed:
+remote:        http://awwyeah.deploy.eol.org
+remote:
+To git@deploy.eol.org:awwyeah
+   ade6ea2..787cdaa  master -&gt; master
+</code></pre>
+
+<h1>and let&rsquo;s see if the site is online</h1>
+
+<pre><code>~/dev/awyeah (master) $ curl http://awyeah.deploy.eol.org
+oh hell yeah
+</code></pre>
+
+<h3>time?</h3>
+
+<pre><code>~/dev/awyeah (master) $ date
+Thu Jun 13 16:18:59 EDT 2013
+</code></pre>
+
+<h1>let&rsquo;s check on that formatting:</h1>
+
+<pre><code>Writing inode tables:  4289/29809
+</code></pre>
+
+<p>plenty of time (also, ext4/4TB is kinda slow&hellip;)</p>
+</div>
+
+
+  <footer>
+    <p class="meta">
+      
+  
+
+<span class="byline author vcard">Posted by <span class="fn"><a href="/about" title="About the author (Anthony Goddard)" rel="author">Anthony Goddard</a></span></span>
+
+      
+
+
+
+
+
+
+
+
+  
+
+
+<time datetime="2013-06-16T22:58:00+10:00" pubdate data-updated="true">Jun 16<span>th</span>, 2013</time>
+      
+
+
+    </p>
+    
+      <div class="sharing">
+  
+  <a href="http://twitter.com/share" class="twitter-share-button" data-url="http://ops.anthonygoddard.com/paas-in-under-10-minutes" data-via="anthonygoddard" data-counturl="http://ops.anthonygoddard.com/paas-in-under-10-minutes" >Tweet</a>
+  
+  
+  <div class="g-plusone" data-size="medium"></div>
+  
+  
+</div>
+
+    
+    <p class="meta">
+      
+        <a class="basic-alignment left" href="/saving-the-world-with-devops" title="Previous Post: Saving the World with DevOps">&laquo; Saving the World with DevOps</a>
+      
+      
+    </p>
+  </footer>
+</article>
+
+  <section>
+    <h1>Comments</h1>
+    <div id="disqus_thread" aria-live="polite"><noscript>Please enable JavaScript to view the <a href="http://disqus.com/?ref_noscript">comments powered by Disqus.</a></noscript>
+</div>
+  </section>
+
+</div>
+
+
+    </div>
+  </div>
+  <footer role="contentinfo"><p>
+  Copyright &copy; 2013 - Anthony Goddard -
+  <span class="credit">Powered by <a href="http://octopress.org">Octopress</a></span>
+</p>
+
+</footer>
+  
+
+<script type="text/javascript">
+      var disqus_shortname = 'opsanthonygoddard';
+      
+        
+        // var disqus_developer = 1;
+        var disqus_identifier = 'http://ops.anthonygoddard.com/paas-in-under-10-minutes';
+        var disqus_url = 'http://ops.anthonygoddard.com/paas-in-under-10-minutes';
+        var disqus_script = 'embed.js';
+      
+    (function () {
+      var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+      dsq.src = 'http://' + disqus_shortname + '.disqus.com/' + disqus_script;
+      (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    }());
+</script>
+
+
+
+
+
+  <script type="text/javascript">
+    (function() {
+      var script = document.createElement('script'); script.type = 'text/javascript'; script.async = true;
+      script.src = 'https://apis.google.com/js/plusone.js';
+      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(script, s);
+    })();
+  </script>
+
+
+
+  <script type="text/javascript">
+    (function(){
+      var twitterWidgets = document.createElement('script');
+      twitterWidgets.type = 'text/javascript';
+      twitterWidgets.async = true;
+      twitterWidgets.src = 'http://platform.twitter.com/widgets.js';
+      document.getElementsByTagName('head')[0].appendChild(twitterWidgets);
+    })();
+  </script>
+
+
+
+
+
+</body>
+</html>
